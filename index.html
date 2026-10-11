@@ -1256,8 +1256,15 @@ body.theme-light .foot{color:#f3eee4}
 .toast{background:var(--paper);color:var(--ink);border:1px solid var(--gold);box-shadow:0 18px 40px rgba(0,0,0,.4)}
 .toast button{color:var(--gold)}
 .auth-mark img{height:64px;width:auto}
-body.theme-light .auth-mark img,.adm-auth-mark img{background:#141414;border-radius:10px;padding:4px 12px}
+
 .adm-auth-mark{display:block;margin-bottom:16px}
+/* Logo del encabezado (diamante con fondo propio: funciona sobre blanco y sobre fotos) */
+.logo-img{height:56px;width:auto;display:block;transition:transform .5s var(--ease-out),filter .4s}
+.brand:hover .logo-img{transform:scale(1.04) rotate(-1deg)}
+.nav.on-dark .logo-img{filter:drop-shadow(0 4px 14px rgba(0,0,0,.45))}
+@media (max-width:960px){.logo-img{height:44px}}
+.mnav__logo.logo-img{height:44px}
+.auth-mark .logo-img{height:72px;margin-bottom:6px}
 .adm__logo img{height:46px;width:auto;margin-bottom:6px}
 .adm__side a[aria-current="page"]{color:#f0d48a;background:rgba(212,175,97,.14)}
 .adm__side a em{background:var(--gold);color:var(--on-gold)}
@@ -1333,7 +1340,7 @@ body.theme-light .brand img{background:none;padding:0}
 .slide__media{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:2px;background:#0d0d0d}
 .slide__media.cols-4{--cols:4}.slide__media.cols-3{--cols:3}.slide__media.cols-2{--cols:2}
 .slide__col{position:relative;overflow:hidden}
-.slide__col img{width:100%;height:100%;object-fit:cover;object-position:50% 22%;transform:scale(1.12);transition:transform 7s cubic-bezier(.2,.6,.2,1)}
+.slide__col img{width:100%;height:100%;object-fit:cover;object-position:50% 45%;transform:scale(1.12);transition:transform 7s cubic-bezier(.2,.6,.2,1)}
 .hero.ready .slide.is-on .slide__col img{transform:scale(1)}
 .slide__col:nth-child(2) img{transition-delay:.12s}.slide__col:nth-child(3) img{transition-delay:.24s}.slide__col:nth-child(4) img{transition-delay:.36s}
 .slide__shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.25) 45%,rgba(0,0,0,.1) 70%,rgba(0,0,0,.35) 100%);pointer-events:none}
@@ -1442,6 +1449,32 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
 .nav__icons .icon-btn svg{transition:transform .3s var(--ease-out)}
 .nav__icons .icon-btn:hover svg{transform:translateY(-2px)}
 @media (prefers-reduced-motion:reduce){.announce__track{animation:none}.slide__col img,.banner__media img{transform:none!important}}
+
+/* Franja de beneficios y pie de página (más sencillo, estilo WESNOCK) */
+.perks{border:0;margin-top:clamp(40px,5vw,72px);background:var(--paper-2)}
+.perks__in{grid-template-columns:repeat(4,minmax(0,1fr))}
+.perk{display:grid;grid-template-columns:auto 1fr;align-items:start;gap:14px;text-align:left;padding:clamp(24px,2.6vw,36px) clamp(14px,2vw,28px);border-left:1px solid var(--line)}
+.perk:first-child{border-left:0;padding-left:0}
+.perk svg{color:var(--ink);margin-top:2px}
+.perk b{display:block;font:600 12.5px/1.3 var(--f-display);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.perk span,.perk a{font-size:13.5px;color:var(--muted)}
+@media (max-width:860px){.perks__in{grid-template-columns:1fr 1fr}.perk:nth-child(3){border-left:0;padding-left:0}.perk:nth-child(n+3){border-top:1px solid var(--line)}}
+@media (max-width:520px){.perks__in{grid-template-columns:1fr}.perk{border-left:0!important;padding-left:0!important;border-top:1px solid var(--line)}.perk:first-child{border-top:0}}
+.foot{background:#0f0f0f;border-top:0;padding-top:clamp(56px,6vw,88px)}
+.foot__grid{grid-template-columns:1.6fr repeat(3,1fr);gap:clamp(24px,3vw,48px)}
+.foot__logo{width:auto;height:74px;margin-bottom:14px}
+.foot__slogan{margin:0;font-size:11.5px;letter-spacing:.24em;color:rgba(243,238,228,.55)}
+.foot__addr{margin:10px 0 0;font-size:13.5px}
+.foot__addr a{color:rgba(243,238,228,.75)}
+.foot__addr a:hover{color:#fff}
+.foot h5{color:rgba(243,238,228,.45);letter-spacing:.22em}
+.foot a{color:rgba(243,238,228,.86)}
+.foot a:hover{color:#fff}
+.foot__big{font-family:var(--f-head);font-weight:700;text-transform:uppercase;letter-spacing:-.045em;line-height:.82;font-size:clamp(56px,14.5vw,250px);text-align:left;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#f3eee4;opacity:1;margin:clamp(48px,6vw,96px) 0 26px;padding:0;white-space:nowrap;overflow:hidden}
+@media (max-width:960px){.foot__grid{grid-template-columns:1fr 1fr}.foot__grid>div:first-child{grid-column:1/-1}}
+.cost-in{width:120px;height:36px;border:1px solid var(--line-2);padding:0 8px;font-size:13.5px;background:#fff}
+.cost-in.is-empty{border-color:#f0d9a0;background:#fff8e6}
+.cost-in:focus{outline:none;border-color:#111;box-shadow:0 0 0 1px #111}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -1488,7 +1521,7 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
   <div class="mnav__scrim" data-close-mnav></div>
   <div class="mnav__panel" role="dialog" aria-modal="true" aria-label="Menú">
     <div class="mnav__head">
-      <span class="logo-script">la Percha</span>
+      <img src="assets/logo-header.png" alt="La Percha" class="logo-img mnav__logo" width="420" height="291">
       <button class="icon-btn" data-close-mnav aria-label="Cerrar menú">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
@@ -1512,7 +1545,7 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
   <div class="wrap">
     <div class="foot__grid">
       <div>
-        <img src="assets/logo-nav.png" alt="La Percha" class="foot__logo" width="180" height="116" loading="lazy">
+        <img src="assets/logo-header.png" alt="La Percha" class="foot__logo" width="420" height="291" loading="lazy">
         <p class="foot__slogan" data-slogan></p>
         <p class="foot__addr"><a href="#" data-map target="_blank" rel="noopener"><span data-address></span></a></p>
       </div>
@@ -1528,7 +1561,7 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
       </div>
       <div><h5>Síguenos</h5><ul><li><a href="#" data-instagram target="_blank" rel="noopener">Instagram</a></li><li><a href="#" data-tiktok target="_blank" rel="noopener">TikTok</a></li><li><a href="#" data-facebook target="_blank" rel="noopener">Facebook</a></li><li><a href="#" data-whatsapp>WhatsApp</a></li></ul></div>
     </div>
-    <div class="foot__big" aria-hidden="true">la Percha</div>
+    <div class="foot__big" aria-hidden="true">La Percha</div>
     <div class="foot__bar">
       <span>© <span id="year"></span> <span data-store-name></span>. Todos los derechos reservados.</span>
       <span data-slogan></span>
@@ -2031,11 +2064,22 @@ function mediaUrl(src) {
   const s = String(src || "");
   return S().catalogo?.fotosEnStorage && /^img\/catalogo\//.test(s) ? `${SUPABASE_URL}/storage/v1/object/public/productos/${s.slice(4)}` : s;
 }
-function img(src, alt, cls = "", attrs = "") {
-  src = mediaUrl(src);
-  return `<img src="${esc(src)}" alt="${esc(alt)}" class="${cls}" loading="lazy" decoding="async" ${attrs}>`;
+/* Ruta alternativa de una foto del catálogo: la otra fuente (carpeta img/ ↔ Supabase Storage) */
+function mediaAlt(src) {
+  const s = String(src || ""), store = `${SUPABASE_URL}/storage/v1/object/public/productos/`;
+  if (!/^img\/catalogo\//.test(s)) return "";
+  return S().catalogo?.fotosEnStorage ? s : store + s.slice(4);
 }
-document.addEventListener("error", e => { if (e.target.tagName === "IMG") e.target.classList.add("broken"); }, true);
+function img(src, alt, cls = "", attrs = "") {
+  const fb = mediaAlt(src); src = mediaUrl(src);
+  return `<img src="${esc(src)}" alt="${esc(alt)}" class="${cls}" loading="lazy" decoding="async" ${fb ? `data-alt="${esc(fb)}"` : ""} ${attrs}>`;
+}
+/* Si una foto no carga, se intenta una vez con la otra fuente; si tampoco, se marca como rota */
+document.addEventListener("error", e => {
+  const t = e.target; if (t.tagName !== "IMG") return;
+  if (t.dataset.alt && !t.dataset.tried) { t.dataset.tried = "1"; t.src = t.dataset.alt; return; }
+  t.classList.add("broken");
+}, true);
 
 let toastT;
 function toast(msg, action) {
@@ -2174,8 +2218,9 @@ function viewError() {
 
 /* Portada estilo editorial (referencia: clemont.co) adaptada a La Percha */
 const HERO_SLIDES = [
-  { imgs: ["assets/hero/lp-0093.jpg", "assets/hero/lp-0094.jpg", "assets/hero/lp-0095.jpg", "assets/hero/lp-0096.jpg"], kicker: "Nueva temporada", title: "Buzos & Crewnecks", href: "#/categoria/buzos", cta: "Compra ahora" },
-  { imgs: ["assets/hero/lp-0164.jpg", "assets/hero/lp-0165.jpg", "assets/hero/lp-0166.jpg"], kicker: "Calidad 1.1", title: "Conjuntos que hablan solos", href: "#/categoria/conjuntos", cta: "Ver conjuntos" }
+  { imgs: ["img/catalogo/camisetas/lp-0004.jpg", "img/catalogo/camisetas/lp-0001.jpg", "img/catalogo/camisetas/lp-0021.jpg", "img/catalogo/camisetas/lp-0035.jpg"], kicker: "Nueva colección", title: "Camisetas que marcan", href: "#/categoria/camisetas", cta: "Ver camisetas" },
+  { imgs: ["img/catalogo/tenis/lp-0382.jpg", "img/catalogo/tenis/lp-0398.jpg", "img/catalogo/tenis/lp-0385.jpg", "img/catalogo/tenis/lp-0353.jpg"], kicker: "Calzado", title: "Tenis para cada paso", href: "#/categoria/tenis", cta: "Ver tenis" },
+  { imgs: ["img/catalogo/camisetas/lp-0024.jpg", "img/catalogo/conjuntos/lp-0173.jpg", "img/catalogo/conjuntos/lp-0164.jpg", "img/catalogo/camisetas/lp-0025.jpg"], kicker: "Looks completos", title: "Conjuntos y streetwear", href: "#/categoria/conjuntos", cta: "Ver conjuntos" }
 ];
 let homeTab = "ropa";
 function railHTML(id, list) {
@@ -2192,12 +2237,12 @@ function viewHome() {
   const spot = [["camisetas", "Camisetas"], ["conjuntos", "Conjuntos"], ["jeans", "Jeans"], ["buzos", "Buzos"], ["tenis", "Tenis"], ["chanclas", "Chanclas"], ["morrales", "Morrales"], ["billeteras", "Billeteras"]]
     .map(([slug, label]) => ({ slug, label, n: catCount(slug), cover: catCover(slug) })).filter(c => c.n);
   const highlight = all.filter(p => Catalog.groupOf(p) === "calzado").slice(0, 8);
-  const insta = ["assets/hero/lp-0095.jpg", "assets/hero/lp-0164.jpg", "assets/hero/lp-0024.jpg", "assets/hero/lp-0166.jpg", "assets/hero/lp-0093.jpg", "assets/hero/lp-0165.jpg"];
+  const insta = ["img/catalogo/camisetas/lp-0004.jpg", "img/catalogo/tenis/lp-0382.jpg", "img/catalogo/camisetas/lp-0024.jpg", "img/catalogo/conjuntos/lp-0173.jpg", "img/catalogo/camisetas/lp-0021.jpg", "img/catalogo/tenis/lp-0347.jpg"];
   const arrows = id => `<div class="rail-nav"><button type="button" class="rail-btn" data-rail="${id}" data-dir="-1" aria-label="Anterior">${ICON.left}</button><button type="button" class="rail-btn" data-rail="${id}" data-dir="1" aria-label="Siguiente">${ICON.right}</button></div>`;
   return `
   <section class="hero hero--slides on-dark" id="hero" aria-label="Portada" aria-roledescription="carrusel">
     ${HERO_SLIDES.map((s, i) => `<div class="slide ${i === 0 ? "is-on" : ""}" data-slide="${i}" aria-hidden="${i !== 0}">
-      <div class="slide__media cols-${s.imgs.length}">${s.imgs.map((src, k) => `<div class="slide__col"><img src="${esc(src)}" alt="" ${i === 0 && k < 2 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`).join("")}</div>
+      <div class="slide__media cols-${s.imgs.length}">${s.imgs.map((src, k) => `<div class="slide__col">${img(src, "", "", i === 0 && k < 2 ? 'loading="eager" fetchpriority="high"' : "")}</div>`).join("")}</div>
       <div class="slide__shade"></div>
       <div class="hero__content wrap"><p class="eyebrow hero__eyebrow">${esc(s.kicker)}</p>
         <${i === 0 ? "h1" : "h2"} class="h-display hero__title"><span class="ln"><span>${esc(s.title)}</span></span></${i === 0 ? "h1" : "h2"}>
@@ -2221,7 +2266,7 @@ function viewHome() {
   </section>
 
   <section class="banner on-dark rv" aria-label="Monogram">
-    <div class="banner__media"><img src="assets/hero/lp-0024.jpg" alt="" loading="lazy"><img src="assets/hero/lp-0025.jpg" alt="" loading="lazy"></div>
+    <div class="banner__media">${img("img/catalogo/camisetas/lp-0024.jpg", "")}${img("img/catalogo/camisetas/lp-0025.jpg", "")}</div>
     <div class="slide__shade"></div>
     <div class="banner__txt wrap"><p class="eyebrow">Edición limitada</p><h2 class="h-display">Monogram Collection</h2><a href="#/categoria/camisetas" class="btn btn--light">Compra ahora</a></div>
   </section>
@@ -2233,14 +2278,14 @@ function viewHome() {
 
   <section class="section--tight insta" aria-labelledby="igTitle">
     <div class="wrap rail-head rv"><h2 class="h-section sm" id="igTitle"><a href="${esc(t.instagram)}" target="_blank" rel="noopener">@laperchavup</a></h2><a class="link-u" href="${esc(t.instagram)}" target="_blank" rel="noopener">Síguenos en Instagram</a></div>
-    <div class="insta__grid">${insta.map(src => `<a href="${esc(t.instagram)}" target="_blank" rel="noopener" class="insta__item" aria-label="Instagram de ${esc(t.nombre)}"><img src="${src}" alt="" loading="lazy"></a>`).join("")}</div>
+    <div class="insta__grid">${insta.map(src => `<a href="${esc(t.instagram)}" target="_blank" rel="noopener" class="insta__item" aria-label="Instagram de ${esc(t.nombre)}">${img(src, "")}</a>`).join("")}</div>
   </section>
 
   <section class="perks" aria-label="Beneficios"><div class="wrap perks__in">
-    <div class="perk rv"><b>Envíos a toda Colombia</b><span>Costo y tiempo según tu ciudad</span></div>
-    <div class="perk rv"><b>5 días para cambios</b><span><a href="#/politicas#cambios">Ver política de cambios</a></span></div>
-    <div class="perk rv"><b>Pagos seguros</b><span>${esc(PaymentGateway.available().map(m => m.nombre.split(" — ")[0]).join(" · "))}</span></div>
-    <div class="perk rv"><b>Tienda en Valledupar</b><span><a href="${esc(t.mapa)}" target="_blank" rel="noopener">${esc(t.direccion)}</a></span></div>
+    <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h11v9H3zM14 9.5h3.5L21 13v2.5h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><div><b>Envíos a toda Colombia</b><span>Costo y tiempo según tu ciudad.</span></div></div>
+    <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><div><b>5 días para cambios</b><span><a href="#/politicas#cambios">Ver política de cambios</a></span></div></div>
+    <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="M3 9.5h18M7 14.5h4"/></svg><div><b>Paga como prefieras</b><span>Nequi, Daviplata, Bancolombia o contra entrega.</span></div></div>
+    <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg><div><b>Tienda en Valledupar</b><span><a href="${esc(t.mapa)}" target="_blank" rel="noopener">Cómo llegar</a></span></div></div>
   </div></section>`;
 }
 function mountHome() {
@@ -3445,11 +3490,11 @@ const Admin = {
       const q = norm(st.q);
       const list = Store.products.filter(p => (!q || norm(p.nombre + " " + p.ref).includes(q)) && (!st.cat || p.categoria === st.cat) &&
         (!st.f || (st.f === "sinprecio" && !Catalog.priceRange(p)) || (st.f === "sincosto" && p.costo == null) || (st.f === "oculto" && !p.visible) || (st.f === "agotado" && !Catalog.hasStock(p)) || (st.f === "destacado" && p.destacado) || (st.f === "oferta" && p.enOferta)));
-      $("#ptable").innerHTML = `<table class="t"><thead><tr><th></th><th>Producto</th><th>Categoría</th><th>Precio venta</th><th>Costo</th><th>Ganancia / u.</th><th>Stock</th><th>Tienda</th><th></th></tr></thead><tbody>
+      $("#ptable").innerHTML = `<table class="t"><thead><tr><th></th><th>Producto</th><th>Categoría</th><th>Precio venta</th><th>Costo (editable)</th><th>Ganancia / u.</th><th>Stock</th><th>Tienda</th><th></th></tr></thead><tbody>
         ${list.map(p => { const r = Catalog.priceRange(p); const m = Catalog.margin(p, r?.min); const units = p.variantes.reduce((a, v) => a + (v.stock || 0), 0);
           return `<tr class="click" data-edit="${esc(p.id)}"><td>${p.imagenes[0] ? img(Catalog.imageSm(p.imagenes[0].src), "") : ""}</td><td><b>${esc(p.nombre)}</b><br><span class="ref">${esc(p.ref)}</span></td><td>${esc(Catalog.categoryName(p.categoria))}</td>
           <td>${r ? (r.min === r.max ? money(r.min) : money(r.min) + " – " + money(r.max)) : '<span class="tag warn">Sin precio</span>'}</td>
-          <td>${p.costo == null ? '<span class="tag warn">No registrado</span>' : money(p.costo)}</td>
+          <td><label class="cost-cell"><span class="sr-only">Costo de ${esc(p.nombre)}</span><input type="number" min="0" step="100" class="cost-in ${p.costo == null ? "is-empty" : ""}" data-cost="${esc(p.id)}" value="${p.costo ?? ""}" placeholder="Agregar costo"></label></td>
           <td>${m ? `${money(m.unit)}<br><small class="muted-text">${pct(m.pct)}</small>` : "—"}</td>
           <td>${stockTag(p)}<br><small class="muted-text">${p.variantes.every(v => v.stock == null) ? "" : units + " u."}</small></td>
           <td>${Catalog.isShown(p) ? '<span class="tag ok">Visible</span>' : !p.visible ? '<span class="tag err">Oculto</span>' : '<span class="tag err">Sin stock</span>'}${p.destacado ? '<span class="tag dark">Destacado</span>' : ""}${p.enOferta ? '<span class="tag dark">Oferta</span>' : ""}</td>
@@ -3459,7 +3504,21 @@ const Admin = {
     $("#pq").oninput = e => { st.q = e.target.value; paint(); };
     $("#pcat").onchange = e => { st.cat = e.target.value; paint(); };
     $("#pf").onchange = e => { st.f = e.target.value; paint(); };
+    /* Costo editable en la tabla: se guarda al salir del campo o con Enter */
+    $("#ptable").addEventListener("change", async e => {
+      const inp = e.target.closest("[data-cost]"); if (!inp) return;
+      const p = Catalog.byId(inp.dataset.cost); if (!p) return;
+      const v = inp.value === "" ? null : Math.max(0, Math.round(Number(inp.value)));
+      if (v !== null && isNaN(v)) return toast("Costo no válido.");
+      inp.disabled = true;
+      const { error } = await sb.from("product_costs").upsert({ product_id: p.id, costo: v, updated_at: new Date().toISOString() });
+      inp.disabled = false;
+      if (error) return toast(friendly(error));
+      p.costo = v; toast(v == null ? `Costo eliminado: ${p.nombre}` : `Costo guardado: ${p.nombre} · ${money(v)}`); paint();
+    });
+    $("#ptable").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.closest("[data-cost]")) e.target.blur(); });
     $("#ptable").onclick = async e => {
+      if (e.target.closest(".cost-cell")) return;
       const del = e.target.closest("[data-del]");
       if (del) {
         e.stopPropagation(); const p = Catalog.byId(del.dataset.del);
@@ -3681,6 +3740,7 @@ const Admin = {
         ${hasColors ? `<div class="field"><span class="field-label">Color</span><div class="entry-colors" role="radiogroup">${colors.map((c, i) => `<label class="entry-color"><input type="radio" name="enColor" value="${esc(c)}" ${i === 0 ? "checked" : ""}><i style="background:${esc((p.colores || []).find(x => x.nombre === c)?.hex || "#ccc")}"></i>${esc(c || "Sin color")}</label>`).join("")}</div></div>` : ""}
         <div id="enSizes">${sizesHTML()}</div>
         <div class="field"><label for="enNota">Nota (opcional)</label><input id="enNota" placeholder="Proveedor, factura de compra, motivo…"></div>
+        <div class="field"><label for="enCosto">Costo por unidad (opcional)</label><input id="enCosto" type="number" min="0" step="100" value="${p.costo ?? ""}" placeholder="Lo que te costó cada unidad"><span class="hint">Actualiza el costo del producto para calcular la ganancia de las próximas ventas.</span></div>
         <div class="entry-total" id="enTotal">Sin cantidades</div>
         <p class="form-msg" id="enMsg" role="alert"></p>
         <button class="btn btn--block" type="submit" id="enSave">Guardar entrada</button>
@@ -3713,6 +3773,11 @@ const Admin = {
       $("#enSave").disabled = true;
       try {
         const r = await rpc("admin_stock_entry", { p_product_id: p.id, p_items: items, p_tipo: state.tipo, p_nota: $("#enNota").value.trim() || null });
+        const cv = $("#enCosto").value.trim();
+        if (cv !== "" && Math.round(Number(cv)) !== p.costo && Number(cv) >= 0) {
+          const { error } = await sb.from("product_costs").upsert({ product_id: p.id, costo: Math.round(Number(cv)), updated_at: new Date().toISOString() });
+          if (error) toast("El stock se guardó, pero no el costo: " + friendly(error));
+        }
         closeModal(); toast(`Inventario actualizado: ${r.variantes} variante(s), ${r.unidades >= 0 ? "+" : ""}${r.unidades} u.`);
         await Api.loadCatalog({ admin: true }); onDone && onDone();
       } catch (err) { msg(friendly(err)); $("#enSave").disabled = false; }
@@ -4177,6 +4242,7 @@ const Admin = {
           <p class="form-msg" id="docMsg" role="status">${s.email_enviado_at ? `Enviado a ${esc(s.email_destino || c.email)} el ${fmtDate(s.email_enviado_at)}.` : c.email ? "" : "El cliente no tiene correo registrado."}</p></div>
         <div class="card-w"><h2>Pago</h2><div class="kv"><span>Medio de pago</span><b>${esc(POS_METHODS[s.metodo_pago] || s.metodo_pago)}</b><span>Forma de pago</span><b>${s.forma_pago === "credito" ? "Crédito" : "Contado"}</b></div></div>
         ${s.estado !== "anulada" ? `<div class="card-w"><h2>Anular venta</h2><p class="muted-text" style="font-size:13px;margin:0 0 10px">Devuelve las unidades al inventario y excluye la venta de las estadísticas. Queda registrada como anulada.</p><button class="btn btn--ghost btn--danger-ghost" id="voidSale">Anular venta</button></div>` : ""}
+        <div class="card-w"><h2>Eliminar venta</h2><p class="muted-text" style="font-size:13px;margin:0 0 10px">Para ventas de prueba, duplicadas o mal registradas. Es permanente y la venta desaparece de las estadísticas.</p><button class="btn btn--ghost btn--danger-ghost" id="delSale">Eliminar venta</button></div>
       </div></div>`);
   },
   mountSale(num, query) {
@@ -4195,6 +4261,15 @@ const Admin = {
       const why = res.voidWhy || "";
       try { await rpc("admin_void_sale", { p_sale_id: s.id, p_motivo: why || "Anulada desde el panel" }); toast("Venta anulada"); await AdminData.load(); render(); } catch (err) { toast(friendly(err)); }
     });
+    $("#delSale").onclick = async () => {
+      const units = s.sale_items.reduce((a, i) => a + (i.stock_descontado || 0), 0);
+      const res = await confirmTyped({ title: "Eliminar venta", word: s.numero, button: "Eliminar definitivamente",
+        message: `Vas a eliminar <b>${esc(s.numero)}</b> de ${esc(s.cliente?.nombre || "Consumidor final")} (${money(s.total)}). <b>Esta acción es permanente.</b>`,
+        extra: units ? `<label class="check-row" style="margin:0 0 14px"><input type="checkbox" name="restock" checked> Devolver al inventario las ${units} unidad(es) descontadas por esta venta</label>` : `<p class="muted-text" style="font-size:13px">Esta venta no tiene unidades descontadas del inventario (anulada o sin control de stock).</p>` });
+      if (!res) return;
+      try { await rpc("admin_delete_sale", { p_sale_id: s.id, p_restock: units ? !!res.restock : false }); toast(`Venta ${s.numero} eliminada`); await AdminData.load(); location.hash = "#/admin/ventas"; }
+      catch (err) { toast(/admin_delete_sale|function|schema cache/i.test(err.message) ? "Falta ejecutar supabase/03_eliminar_ventas_y_textos.sql en Supabase." : friendly(err)); }
+    };
     if (query?.enviar === "1" && s.cliente?.email && !s.email_enviado_at) {
       history.replaceState(null, "", location.pathname + location.search + "#/admin/ventas/" + encodeURIComponent(s.numero) + "?nueva=1");
       withBusy($("#docEmail"), send);
@@ -4743,7 +4818,7 @@ function subscribeRealtime() {
 function brandMark(cls = "") {
   const s = S().tienda;
   if (s.logo) return `<img src="${esc(s.logo)}" alt="${esc(s.nombre)}" class="${cls}" width="180" height="116">`;
-  return `<span class="logo-script ${cls}" aria-label="${esc(s.nombre)}">la Percha</span>`;
+  return `<img src="assets/logo-header.png" alt="${esc(s.nombre)}" class="logo-img ${cls}" width="420" height="291">`;
 }
 function applyBranding() {
   const s = S();
