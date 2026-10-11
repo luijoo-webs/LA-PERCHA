@@ -2215,7 +2215,9 @@ function crumbs(items) {
   return `<nav class="crumbs" aria-label="Ruta">${items.map((it, i) => (i ? '<span aria-hidden="true">/</span>' : "") + (it.href ? `<a href="${it.href}">${esc(it.label)}</a>` : `<span aria-current="page">${esc(it.label)}</span>`)).join("")}</nav>`;
 }
 const catCount = slug => Catalog.products().filter(p => p.categoria === slug).length;
-function catCover(slug) { const p = Catalog.products().find(x => x.categoria === slug && x.imagenes.length); return p ? Catalog.imageSm(p.imagenes[0].src) : ""; }
+/* Portadas fijas por categoría (pedidas por el cliente). Si no hay, se usa la primera foto de la categoría. */
+const CAT_COVERS = { tenis: "img/catalogo/tenis/lp-0329-portada.jpg", calzado: "img/catalogo/tenis/lp-0329-portada.jpg" };
+function catCover(slug) { if (CAT_COVERS[slug]) return Catalog.imageSm(CAT_COVERS[slug]); const p = Catalog.products().find(x => x.categoria === slug && x.imagenes.length); return p ? Catalog.imageSm(p.imagenes[0].src) : ""; }
 function activeCategories(group) { return Store.categories.filter(c => (!group || c.grupo === group) && catCount(c.slug) > 0); }
 function catCard(c) { const n = catCount(c.slug); return `<a href="#/categoria/${c.slug}" class="cat-card rv">${img(catCover(c.slug), c.nombre)}<span>${esc(c.nombre)}<small>${n} ${n === 1 ? "producto" : "productos"}</small></span></a>`; }
 function statusPill(e) { return `<span class="pill st-${e}"><i></i>${esc(ORDER_STATUS[e] || e)}</span>`; }
@@ -2241,7 +2243,7 @@ function viewError() {
 /* Portada estilo editorial (referencia: clemont.co) adaptada a La Percha */
 const HERO_SLIDES = [
   { imgs: ["img/catalogo/camisetas/lp-0004.jpg", "img/catalogo/camisetas/lp-0001.jpg", "img/catalogo/camisetas/lp-0021.jpg", "img/catalogo/camisetas/lp-0035.jpg"], kicker: "Nueva colección", title: "Camisetas que marcan", href: "#/categoria/camisetas", cta: "Ver camisetas" },
-  { imgs: ["img/catalogo/tenis/lp-0382.jpg", "img/catalogo/tenis/lp-0398.jpg", "img/catalogo/tenis/lp-0385.jpg", "img/catalogo/tenis/lp-0353.jpg"], kicker: "Calzado", title: "Tenis para cada paso", href: "#/categoria/tenis", cta: "Ver tenis" },
+  { imgs: ["img/catalogo/tenis/lp-0329-portada.jpg", "img/catalogo/tenis/lp-0382.jpg", "img/catalogo/tenis/lp-0353.jpg"], kicker: "Calzado", title: "Tenis para cada paso", href: "#/categoria/tenis", cta: "Ver tenis" },
   { imgs: ["img/catalogo/camisetas/lp-0024.jpg", "img/catalogo/conjuntos/lp-0173.jpg", "img/catalogo/conjuntos/lp-0164.jpg", "img/catalogo/camisetas/lp-0025.jpg"], kicker: "Looks completos", title: "Conjuntos y streetwear", href: "#/categoria/conjuntos", cta: "Ver conjuntos" }
 ];
 let homeTab = "ropa";
