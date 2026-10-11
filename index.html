@@ -1475,6 +1475,28 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
 .cost-in{width:120px;height:36px;border:1px solid var(--line-2);padding:0 8px;font-size:13.5px;background:#fff}
 .cost-in.is-empty{border-color:#f0d9a0;background:#fff8e6}
 .cost-in:focus{outline:none;border-color:#111;box-shadow:0 0 0 1px #111}
+
+/* Tienda física: mini mapa + selector Waze / Google Maps */
+.store{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(20px,4vw,56px);align-items:center;border-top:1px solid var(--line);padding-top:clamp(28px,4vw,48px)}
+.store__addr{font-size:16px;color:var(--ink-2);margin:12px 0 22px;max-width:36ch}
+.minimap{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--tile);cursor:pointer;border:1px solid var(--line)}
+.minimap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;filter:grayscale(.35) contrast(1.05);transition:filter .4s,transform 1.2s var(--ease-out)}
+.minimap:hover iframe,.minimap:focus-visible iframe{filter:none;transform:scale(1.03)}
+.minimap__pin{position:absolute;left:14px;bottom:14px;right:14px;max-width:340px;background:#fff;color:#111;padding:12px 14px;display:grid;gap:2px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.minimap__pin b{font:600 13px/1.2 var(--f-head);text-transform:uppercase}
+.minimap__pin small{font-size:12.5px;color:#555}
+.minimap__pin em{font-style:normal;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-top:4px}
+@media (max-width:860px){.store{grid-template-columns:1fr}}
+.dir-pick{display:grid;gap:10px}
+.dir-opt{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:center;border:1px solid var(--line);padding:12px 14px;transition:border-color .2s,transform .2s}
+.dir-opt:hover{border-color:var(--ink);transform:translateY(-1px)}
+.dir-opt b{display:block;font-size:15px}.dir-opt small{color:var(--muted);font-size:12.5px}
+.dir-ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:800 18px/1 var(--f-display);color:#fff}
+.dir-ic--waze{background:#33ccff;color:#0b2a3a}.dir-ic--gmaps{background:#34a853}
+.foot__dir{color:rgba(243,238,228,.75);text-align:left;font-size:13.5px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(243,238,228,.3)}
+.foot__dir:hover{color:#fff}
+.link-plain{color:var(--muted);font-size:13.5px;text-decoration:underline;text-underline-offset:3px}
+.link-plain:hover{color:var(--ink)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -1547,7 +1569,7 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
       <div>
         <img src="assets/logo-header.png" alt="La Percha" class="foot__logo" width="420" height="291" loading="lazy">
         <p class="foot__slogan" data-slogan></p>
-        <p class="foot__addr"><a href="#" data-map target="_blank" rel="noopener"><span data-address></span></a></p>
+        <p class="foot__addr"><button type="button" class="foot__dir" data-directions><span data-address></span></button></p>
       </div>
       <div><h5>Tienda</h5><ul id="footCats"></ul></div>
       <div>
@@ -1669,8 +1691,8 @@ const SITE_URL = location.origin + location.pathname;
    (tabla store_settings). Este valor solo se usa si aún no hay configuración.
    ========================================================================= */
 const DEFAULT_SETTINGS = {
-  tienda: { nombre: "La Percha", eslogan: "Tienda de ropa exclusiva", direccion: "Cra. 19E2 #13B-46, La Elvira, Valledupar, Cesar",
-            mapa: "https://www.google.com/maps?q=10.471250,-73.262222", instagram: "https://www.instagram.com/laperchavup/",
+  tienda: { nombre: "La Percha", eslogan: "Tienda de ropa exclusiva", direccion: "Cra. 19E2 #13B-46, frente a la cancha de Las Flores, Valledupar, Cesar",
+            mapaDireccion: "Carrera 19E2 #13B-46, Valledupar, Cesar", instagram: "https://www.instagram.com/laperchavup/",
             tiktok: "https://www.tiktok.com/@lapercha_store17", facebook: "", correo: "", moneda: "COP", locale: "es-CO", logo: "", temaVisual: "claro" },
   whatsapp: { numero: "573144543114", mensajeGeneral: "Hola La Percha, quiero información." },
   catalogo: { permitirSinPrecio: true, porPagina: 24 },
@@ -1688,7 +1710,7 @@ const DEFAULT_SETTINGS = {
              politicaCambios: "Tienes 5 días hábiles desde que recibes tu pedido para solicitar un cambio de talla o referencia. La prenda debe estar sin uso, sin lavar y con sus etiquetas. Escríbenos por WhatsApp con tu número de pedido. Consulta la política completa en la sección Políticas." },
   inventario: { umbralStockBajo: 2 },
   /* Facturación: vacío hasta que el negocio lo configure en Admin → Facturación (no se inventan datos tributarios) */
-  facturacion: { razonSocial: "", nombreComercial: "La Percha", nit: "", dv: "", direccion: "Cra. 19E2 #13B-46, La Elvira", ciudad: "Valledupar, Cesar", telefono: "314 454 3114", correo: "", logo: "",
+  facturacion: { razonSocial: "", nombreComercial: "La Percha", nit: "", dv: "", direccion: "Cra. 19E2 #13B-46, frente a la cancha de Las Flores", ciudad: "Valledupar, Cesar", telefono: "314 454 3114", correo: "", logo: "",
     regimen: "", responsabilidades: "", prefijoInterno: "VF-", prefijoDian: "", numeracionDesde: null, numeracionHasta: null,
     resolucionNumero: "", resolucionFecha: "", resolucionVigenciaHasta: "", proveedor: { nombre: "", ambiente: "pruebas", estado: "no_configurado", notas: "" },
     estadoIntegracion: "no_integrada", ivaTarifa: null, preciosIncluyenIva: true, notaLegal: "", textoPie: "Gracias por tu compra en La Percha.", enviarCorreoAlVender: true }
@@ -2281,11 +2303,18 @@ function viewHome() {
     <div class="insta__grid">${insta.map(src => `<a href="${esc(t.instagram)}" target="_blank" rel="noopener" class="insta__item" aria-label="Instagram de ${esc(t.nombre)}">${img(src, "")}</a>`).join("")}</div>
   </section>
 
+  <section class="section--tight wrap" aria-labelledby="storeTitle"><div class="store rv">
+    <div class="store__txt"><p class="eyebrow">Tienda física</p><h2 class="h-section sm" id="storeTitle">Visítanos en Valledupar</h2>
+      <p class="store__addr">${esc(t.direccion)}</p>
+      <div class="btns-row"><button type="button" class="btn" data-directions>Cómo llegar</button><a class="btn btn--ghost" href="${esc(waLink())}" target="_blank" rel="noopener">${ICON.wa} Escríbenos</a></div></div>
+    ${miniMap()}
+  </div></section>
+
   <section class="perks" aria-label="Beneficios"><div class="wrap perks__in">
     <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h11v9H3zM14 9.5h3.5L21 13v2.5h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><div><b>Envíos a toda Colombia</b><span>Costo y tiempo según tu ciudad.</span></div></div>
     <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><div><b>5 días para cambios</b><span><a href="#/politicas#cambios">Ver política de cambios</a></span></div></div>
     <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="M3 9.5h18M7 14.5h4"/></svg><div><b>Paga como prefieras</b><span>Nequi, Daviplata, Bancolombia o contra entrega.</span></div></div>
-    <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg><div><b>Tienda en Valledupar</b><span><a href="${esc(t.mapa)}" target="_blank" rel="noopener">Cómo llegar</a></span></div></div>
+    <div class="perk rv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg><div><b>Tienda en Valledupar</b><span><button type="button" class="link-plain" data-directions>Cómo llegar</button></span></div></div>
   </div></section>`;
 }
 function mountHome() {
@@ -3890,7 +3919,7 @@ const Admin = {
         <div class="card-w"><h2>Información de la tienda</h2><div class="fg">
           ${f("t_nombre", "Nombre", s.tienda.nombre)}${f("t_eslogan", "Eslogan", s.tienda.eslogan)}
           <div class="field full"><label for="t_dir">Dirección / contacto</label><input id="t_dir" name="t_dir" value="${esc(s.tienda.direccion)}"></div>
-          ${f("t_mapa", "Enlace de Google Maps", s.tienda.mapa, "url")}${f("t_correo", "Correo de contacto", s.tienda.correo, "email", 'placeholder="Pendiente"')}
+          ${f("t_mapa", "Dirección para el mapa (Waze / Google Maps)", s.tienda.mapaDireccion, "text", 'placeholder="Carrera 19E2 #13B-46, Valledupar, Cesar"')}${f("t_correo", "Correo de contacto", s.tienda.correo, "email", 'placeholder="Pendiente"')}
           ${f("t_ig", "Instagram (URL)", s.tienda.instagram, "url")}${f("t_tt", "TikTok (URL)", s.tienda.tiktok, "url")}
           ${f("t_fb", "Facebook (URL, opcional)", s.tienda.facebook, "url")}${f("t_logo", "Logo (URL de imagen, opcional)", s.tienda.logo, "text", 'placeholder="Vacío = logo de La Percha"')}
           <div class="field"><label for="t_tema">Tema de la tienda</label><select id="t_tema" name="t_tema"><option value="claro" ${s.tienda.temaVisual !== "oscuro" ? "selected" : ""}>Claro editorial (recomendado)</option><option value="oscuro" ${s.tienda.temaVisual === "oscuro" ? "selected" : ""}>Oscuro y dorado</option></select></div>
@@ -3936,7 +3965,7 @@ const Admin = {
       if (!/^\d{11,15}$/.test(wa)) { toast("Número de WhatsApp no válido. Usa el formato 573XXXXXXXXX."); return; }
       s.whatsapp.numero = wa; s.whatsapp.mensajeGeneral = fd.wa_msg.trim() || DEFAULT_SETTINGS.whatsapp.mensajeGeneral;
       s.tienda.nombre = fd.t_nombre.trim() || "La Percha"; s.tienda.eslogan = fd.t_eslogan.trim(); s.tienda.direccion = fd.t_dir.trim(); s.tienda.instagram = fd.t_ig.trim(); s.tienda.logo = fd.t_logo.trim();
-      s.tienda.tiktok = fd.t_tt.trim(); s.tienda.facebook = fd.t_fb.trim(); s.tienda.mapa = fd.t_mapa.trim(); s.tienda.correo = fd.t_correo.trim(); s.tienda.temaVisual = fd.t_tema === "oscuro" ? "oscuro" : "claro";
+      s.tienda.tiktok = fd.t_tt.trim(); s.tienda.facebook = fd.t_fb.trim(); s.tienda.mapaDireccion = fd.t_mapa.trim(); s.tienda.correo = fd.t_correo.trim(); s.tienda.temaVisual = fd.t_tema === "oscuro" ? "oscuro" : "claro";
       if (s.pagos.addi) { s.pagos.addi.widgetSlug = (fd.addi_slug || "").trim(); s.pagos.addi.widgetScript = (fd.addi_script || "").trim(); }
       s.pedidos.prefijo = fd.o_prefijo.trim() || "LP-"; s.pedidos.costoEnvio = fd.o_envio === "" ? null : Math.max(0, Math.round(Number(fd.o_envio)));
       s.pedidos.textoEnvio = fd.o_texto.trim(); s.pedidos.politicaCambios = fd.o_cambios.trim();
@@ -4814,6 +4843,29 @@ function subscribeRealtime() {
 /* =========================================================================
    INICIO
    ========================================================================= */
+/* Ubicación de la tienda: mini mapa (por dirección, sin coordenadas) y selector Waze / Google Maps */
+function mapQuery() { const t = S().tienda; return t.mapaDireccion || t.direccion; }
+function directionLinks() {
+  const q = encodeURIComponent(mapQuery());
+  return { google: `https://www.google.com/maps/search/?api=1&query=${q}`, waze: `https://waze.com/ul?q=${q}&navigate=yes` };
+}
+function miniMap() {
+  const t = S().tienda;
+  return `<div class="minimap" data-directions role="button" tabindex="0" aria-label="Cómo llegar a ${esc(t.nombre)}: ${esc(t.direccion)}">
+    <iframe src="https://maps.google.com/maps?q=${encodeURIComponent(mapQuery())}&z=16&output=embed" title="Mapa de ${esc(t.nombre)}" loading="lazy" tabindex="-1" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <span class="minimap__pin"><b>${esc(t.nombre)}</b><small>${esc(t.direccion)}</small><em>Toca para elegir Waze o Google Maps</em></span></div>`;
+}
+function openDirections() {
+  const l = directionLinks(), t = S().tienda;
+  openModal("Cómo llegar", `<p style="margin:0 0 6px;font-size:14px"><b>${esc(t.nombre)}</b></p><p style="margin:0 0 18px;font-size:14px;color:var(--muted)">${esc(t.direccion)}</p>
+    <div class="dir-pick">
+      <a class="dir-opt" href="${esc(l.waze)}" target="_blank" rel="noopener" data-close-modal><span class="dir-ic dir-ic--waze">W</span><span><b>Waze</b><small>Abrir la ruta en Waze</small></span></a>
+      <a class="dir-opt" href="${esc(l.google)}" target="_blank" rel="noopener" data-close-modal><span class="dir-ic dir-ic--gmaps">G</span><span><b>Google Maps</b><small>Abrir la ubicación en Google Maps</small></span></a>
+    </div>`);
+}
+document.addEventListener("click", e => { if (e.target.closest("[data-directions]")) { e.preventDefault(); openDirections(); } });
+document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".minimap")) { e.preventDefault(); openDirections(); } });
+
 /* Logo de la marca (PNG transparente en dorado). Si se configura otro logo en Admin, se usa ese. */
 function brandMark(cls = "") {
   const s = S().tienda;
@@ -4829,7 +4881,6 @@ function applyBranding() {
   $$("[data-wordmark], [data-wordmark-plain], [data-store-name]").forEach(el => el.textContent = s.tienda.nombre);
   $$("[data-slogan]").forEach(el => el.textContent = s.tienda.eslogan);
   $$("[data-address]").forEach(el => el.textContent = s.tienda.direccion);
-  $$("[data-map]").forEach(a => { a.href = s.tienda.mapa || "https://www.google.com/maps/search/" + encodeURIComponent(s.tienda.direccion); });
   $("#year").textContent = new Date().getFullYear();
   $$("[data-whatsapp]").forEach(a => { a.href = waLink(); a.target = "_blank"; a.rel = "noopener"; });
   for (const net of ["instagram", "tiktok", "facebook"])
