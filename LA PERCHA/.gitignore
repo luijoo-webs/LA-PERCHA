@@ -1,0 +1,6 @@
+# Archivos de la tienda base (otro cliente): nunca publicar
+_base_wesnock/
+# Fotos fuente del cliente (la tienda usa img/catalogo)
+Catalogo/
+.claude/
+*.log
