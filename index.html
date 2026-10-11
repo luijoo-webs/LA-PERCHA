@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://zynoecehvssvtfdktqyj.supabase.co">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Cormorant+Garamond:wght@500;600;700&family=Great+Vibes&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Syne:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Great+Vibes&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* =========================================================
    TOKENS
@@ -1278,11 +1278,179 @@ body:not(.theme-light):not(.is-admin) .size.is-out{text-decoration-color:rgba(25
 body:not(.theme-light):not(.is-admin) .demo-banner{background:rgba(255,255,255,.04)}
 body:not(.theme-light):not(.is-admin) .field input,body:not(.theme-light):not(.is-admin) .field select,body:not(.theme-light):not(.is-admin) .field textarea{background:#151515}
 body:not(.theme-light):not(.is-admin) img.broken,body:not(.theme-light):not(.is-admin) .imgbox:has(img.broken)::before{color:#4a463e}
+
+/* =========================================================
+   LA PERCHA — diseño editorial (referencia clemont.co)
+   Tema claro por defecto: blanco, negro y dorado solo en la marca
+   ========================================================= */
+:root{--f-head:"Syne","Archivo",sans-serif;--ann-h:34px;--brand-gold:#c9a24e}
+body.theme-light{
+  --bg:#ffffff;--paper:#ffffff;--paper-2:#f5f5f4;--tile:#e9e8e5;--ink:#111111;--ink-2:#2b2b2b;--muted:#6d6d6d;
+  --line:#e7e6e3;--line-2:#d4d2cd;--gold:#111111;--gold-2:#2c2c2c;--on-gold:#ffffff;--grad-gold:linear-gradient(#111,#111);
+  --glass:rgba(255,255,255,.97);--f-body:"Archivo","Helvetica Neue",Arial,sans-serif;--f-display:"Archivo","Helvetica Neue",Arial,sans-serif}
+body.theme-light .h-display,body.theme-light .h-section,body.theme-light .info h1,body.theme-light .tile__txt h3,body.theme-light .empty h3,body.theme-light .drawer-empty h3,
+body.theme-light .auth-title,body.theme-light .acct-name,body.theme-light .acct-h,body.theme-light .panel h2,body.theme-light .done h1,body.theme-light .acct-empty h3,body.theme-light .policy h2{
+  font-family:var(--f-head);font-weight:600;text-transform:uppercase;letter-spacing:-.01em;line-height:.98}
+body.theme-light .policy h2{color:var(--ink);font-size:20px}
+body.theme-light .price{color:var(--ink);font-weight:600}
+body.theme-light .btn:not(.btn--ghost):not(.btn--light):not(.btn--outline-light):not(.btn--danger):not(.btn--wa):not(.btn--danger-ghost):hover{filter:none;background:#2c2c2c}
+body.theme-light .toast{background:#111;color:#fff;border-color:#111}
+body.theme-light .toast button{color:#fff}
+body.theme-light .wa{background:#111;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+body.theme-light .svc h4,body.theme-light .eyebrow.gold,body.theme-light .gold{color:inherit}
+
+/* Barra de anuncios animada */
+.announce{position:relative;z-index:61;height:var(--ann-h);background:#0d0d0d;color:#f2efe8;overflow:hidden;display:flex;align-items:center;font:600 11px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase}
+.announce__track{display:flex;gap:48px;white-space:nowrap;animation:marquee 32s linear infinite;padding-left:48px}
+.announce__track span::before{content:"✦";color:var(--brand-gold);margin-right:48px}
+@keyframes marquee{to{transform:translateX(-50%)}}
+body.is-admin .announce{display:none}
+.nav{top:var(--ann-h);transition:top .35s var(--ease),background .45s var(--ease),color .45s var(--ease),border-color .45s var(--ease),transform .45s var(--ease)}
+body.scrolled .nav{top:0}
+.page{padding-top:calc(var(--nav-h) + clamp(20px,3vw,44px))}
+
+/* Navegación: enlaces a la izquierda, marca al centro, iconos a la derecha */
+@media (min-width:961px){
+  .nav__in{grid-template-columns:1fr auto 1fr}
+  .nav__in>nav{grid-column:1;grid-row:1;justify-self:start}
+  .nav__in .brand{grid-column:2;grid-row:1;justify-self:center}
+  .nav__icons{grid-column:3;grid-row:1}
+  .nav__links a{font-family:var(--f-display);font-size:12px;letter-spacing:.12em}
+}
+.logo-script{font-family:var(--f-script);font-size:40px;line-height:1;letter-spacing:0;white-space:nowrap;display:inline-block;transform:translateY(2px)}
+.nav .logo-script{transition:color .4s var(--ease)}
+.nav.on-dark .logo-script{color:#fff}
+@media (max-width:960px){.logo-script{font-size:34px}}
+.brand img,.brand__img{filter:none}
+body.theme-light .brand img{background:none;padding:0}
+.auth-mark .logo-script{font-size:46px}
+.mnav__head .logo-script{font-size:34px}
+
+/* Héroe: presentación de fotos a pantalla completa */
+.hero--slides{height:100vh;height:100svh;min-height:560px;max-height:1000px;background:#0d0d0d}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity 1.2s var(--ease),visibility 0s 1.2s}
+.slide.is-on{opacity:1;visibility:visible;transition:opacity 1.2s var(--ease)}
+.slide__media{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:2px;background:#0d0d0d}
+.slide__media.cols-4{--cols:4}.slide__media.cols-3{--cols:3}.slide__media.cols-2{--cols:2}
+.slide__col{position:relative;overflow:hidden}
+.slide__col img{width:100%;height:100%;object-fit:cover;object-position:50% 22%;transform:scale(1.12);transition:transform 7s cubic-bezier(.2,.6,.2,1)}
+.hero.ready .slide.is-on .slide__col img{transform:scale(1)}
+.slide__col:nth-child(2) img{transition-delay:.12s}.slide__col:nth-child(3) img{transition-delay:.24s}.slide__col:nth-child(4) img{transition-delay:.36s}
+.slide__shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.25) 45%,rgba(0,0,0,.1) 70%,rgba(0,0,0,.35) 100%);pointer-events:none}
+.hero--slides .hero__content{position:absolute;inset:auto 0 0 0;padding-bottom:clamp(56px,10vh,110px);color:#fff}
+.hero--slides .hero__title{font-size:clamp(46px,7vw,118px);max-width:14ch}
+.hero--slides .hero__title .ln>span{white-space:normal}
+.slide .hero__eyebrow,.slide .hero__cta{opacity:0;transform:translateY(18px);transition:opacity .8s var(--ease) .1s,transform .9s var(--ease-out) .1s}
+.slide .hero__title .ln>span{transform:translateY(105%);transition:transform 1.1s var(--ease-out) .25s}
+.hero.ready .slide.is-on .hero__eyebrow{opacity:.9;transform:none;transition-delay:.35s}
+.hero.ready .slide.is-on .hero__title .ln>span{transform:none}
+.hero.ready .slide.is-on .hero__cta{opacity:1;transform:none;transition-delay:.7s}
+.slide-dots{position:absolute;right:var(--gutter);bottom:clamp(56px,10vh,110px);z-index:5;display:flex;gap:10px}
+.slide-dots button{width:44px;height:24px;display:grid;align-items:center}
+.slide-dots i{display:block;height:2px;background:rgba(255,255,255,.35);position:relative;overflow:hidden}
+.slide-dots i::after{content:"";position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left}
+.slide-dots [aria-selected="true"] i::after{animation:dotfill 6.5s linear forwards}
+@keyframes dotfill{to{transform:scaleX(1)}}
+@media (max-width:960px){.slide__media.cols-4{--cols:2}.slide__media.cols-4 .slide__col:nth-child(n+3){display:none}.slide__media.cols-3{--cols:2}.slide__media.cols-3 .slide__col:nth-child(3){display:none}}
+@media (max-width:600px){.slide__media{--cols:1!important}.slide__media .slide__col:nth-child(n+2){display:none}.slide-dots{left:var(--gutter);right:auto;bottom:20px}.hero--slides .hero__content{padding-bottom:64px}}
+
+/* Encabezados de sección y carruseles */
+.h-section.sm{font-size:clamp(20px,2vw,28px)}
+.home-pop{padding-bottom:clamp(28px,3vw,48px)}
+.home-spot{padding-top:0}
+.insta{padding-top:clamp(40px,5vw,72px)}
+.rail-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:clamp(16px,2vw,24px)}
+.rail-tabs{display:flex;gap:clamp(14px,2vw,26px);flex-wrap:wrap}
+.rail-tabs button{font:600 13px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;padding:8px 0;color:var(--muted);border-bottom:1.5px solid transparent;transition:color .25s,border-color .25s}
+.rail-tabs button:hover{color:var(--ink)}
+.rail-tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.rail-nav{display:flex;gap:6px}
+.rail-btn{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);transition:background .25s,color .25s,border-color .25s}
+.rail-btn:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rail-btn svg{width:18px;height:18px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 3 * 14px) / 4);gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;padding-bottom:4px}
+.rail::-webkit-scrollbar{display:none}
+.rail__item{scroll-snap-align:start;min-width:0}
+.rail .card.rv{opacity:1;transform:none}
+@media (max-width:1180px){.rail{grid-auto-columns:calc((100% - 2 * 14px) / 3)}}
+@media (max-width:720px){.rail{grid-auto-columns:72%}.rail-nav{display:none}}
+.wrap-left{padding-left:var(--gutter);scroll-padding-left:var(--gutter)}
+.rail--spot{grid-auto-columns:calc((100% - 2 * 14px) / 3.15)}
+@media (max-width:960px){.rail--spot{grid-auto-columns:62%}}
+@media (max-width:600px){.rail--spot{grid-auto-columns:82%}}
+.spot{position:relative;display:block;aspect-ratio:3/4;overflow:hidden;background:var(--tile);color:#fff}
+.spot__img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.4s var(--ease-out)}
+.spot::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent 55%)}
+.spot:hover .spot__img img{transform:scale(1.05)}
+.spot__txt{position:absolute;left:20px;right:20px;bottom:20px;z-index:2;display:grid;gap:12px;justify-items:start}
+.spot__txt b{font:600 clamp(22px,2.4vw,32px)/1 var(--f-head);text-transform:uppercase}
+.spot__txt em{font:600 11px/1 var(--f-display);letter-spacing:.16em;text-transform:uppercase;font-style:normal;background:#fff;color:#111;padding:12px 16px;transition:background .3s,color .3s}
+.spot:hover .spot__txt em{background:#111;color:#fff}
+
+/* Tarjeta de producto estilo Clemont */
+body.theme-light .card__media{background:var(--tile);aspect-ratio:4/5}
+body.theme-light .card__media img{object-fit:cover}
+body.theme-light .card__body{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:12px 2px 0}
+body.theme-light .card__name{font:500 13px/1.3 var(--f-display);text-transform:uppercase;letter-spacing:.01em}
+body.theme-light .card__cat{font-size:10.5px;letter-spacing:.12em}
+body.theme-light .card__price .price{font-size:13.5px}
+body.theme-light .card__add{border-color:var(--line)}
+body.theme-light .fav{background:#111;color:#fff;width:36px;height:36px;top:10px;right:10px;opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s,background .3s}
+body.theme-light .fav.on{opacity:1;transform:none}
+body.theme-light .fav.on svg{fill:#fff}
+body.theme-light .card:hover .fav,body.theme-light .fav:focus-visible{opacity:1;transform:none}
+@media (hover:none){body.theme-light .fav{opacity:1;transform:none}}
+body.theme-light .badge{background:#3a3a3a;color:#fff;font-size:9.5px;letter-spacing:.1em;padding:6px 8px;top:10px;left:10px}
+.badge--new{background:#3a3a3a}
+.card__media img.main{animation:imgIn .9s var(--ease) both}
+@keyframes imgIn{from{opacity:0;filter:blur(6px)}to{opacity:1;filter:none}}
+
+/* Banner intermedio */
+.banner{position:relative;height:clamp(420px,80vh,820px);overflow:hidden;background:#0d0d0d;color:#fff}
+.banner__media{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.banner__media img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;transform:scale(1.06);transition:transform 1.8s var(--ease-out)}
+.banner.in .banner__media img{transform:none}
+.banner__txt{position:absolute;inset:auto 0 0 0;padding-bottom:clamp(40px,8vh,90px);z-index:2;display:grid;gap:14px;justify-items:start}
+.banner__txt .h-display{font-size:clamp(40px,6vw,96px);color:#fff}
+@media (max-width:600px){.banner__media{grid-template-columns:1fr}.banner__media img:nth-child(2){display:none}}
+
+/* Instagram y beneficios */
+.insta__grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
+.insta__item{position:relative;aspect-ratio:1;overflow:hidden;display:block;background:var(--tile)}
+.insta__item img{width:100%;height:100%;object-fit:cover;transition:transform 1s var(--ease-out),opacity .4s}
+.insta__item::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .3s}
+.insta__item:hover img{transform:scale(1.06)}.insta__item:hover::after{background:rgba(0,0,0,.25)}
+@media (max-width:720px){.insta__grid{grid-template-columns:repeat(3,1fr)}}
+.insta h2 a:hover{text-decoration:underline;text-underline-offset:6px}
+.perks{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:clamp(40px,5vw,72px)}
+.perks__in{display:grid;grid-template-columns:repeat(4,1fr)}
+.perk{display:grid;gap:6px;text-align:center;padding:clamp(24px,3vw,40px) 14px;border-left:1px solid var(--line)}
+.perk:first-child{border-left:0}
+.perk b{font:600 13px/1.2 var(--f-head);text-transform:uppercase;letter-spacing:.04em}
+.perk span,.perk a{font-size:13px;color:var(--muted)}
+.perk a:hover{color:var(--ink);text-decoration:underline}
+@media (max-width:860px){.perks__in{grid-template-columns:1fr 1fr}.perk:nth-child(3){border-left:0}.perk:nth-child(n+3){border-top:1px solid var(--line)}}
+
+/* Animaciones de entrada más ricas */
+.rv{transform:translateY(30px)}
+.rv.in{transform:none}
+.btn{position:relative;overflow:hidden;isolation:isolate}
+.btn--light::before,.btn--ghost::before{content:"";position:absolute;inset:0;background:#111;transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease-out);z-index:-1}
+.btn--light:hover::before,.btn--ghost:hover::before{transform:scaleX(1);transform-origin:left}
+.btn--light:hover{color:#fff;background:#f6f5f2}
+body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
+.nav__icons .icon-btn svg{transition:transform .3s var(--ease-out)}
+.nav__icons .icon-btn:hover svg{transform:translateY(-2px)}
+@media (prefers-reduced-motion:reduce){.announce__track{animation:none}.slide__col img,.banner__media img{transform:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
-<body>
+<body class="theme-light">
 <a href="#app" class="skip">Saltar al contenido</a>
+<div class="announce" aria-label="Información de la tienda"><div class="announce__track">
+  <span>Envíos a toda Colombia</span><span>5 días para cambios</span><span>Paga con Nequi, Daviplata o Bancolombia</span><span>Tienda física en Valledupar</span><span>Confirmamos tu pedido por WhatsApp</span>
+  <span aria-hidden="true">Envíos a toda Colombia</span><span aria-hidden="true">5 días para cambios</span><span aria-hidden="true">Paga con Nequi, Daviplata o Bancolombia</span><span aria-hidden="true">Tienda física en Valledupar</span><span aria-hidden="true">Confirmamos tu pedido por WhatsApp</span>
+</div></div>
 
 <!-- ===================== NAV ===================== -->
 <header class="nav" id="nav">
@@ -1320,7 +1488,7 @@ body:not(.theme-light):not(.is-admin) img.broken,body:not(.theme-light):not(.is-
   <div class="mnav__scrim" data-close-mnav></div>
   <div class="mnav__panel" role="dialog" aria-modal="true" aria-label="Menú">
     <div class="mnav__head">
-      <img src="assets/logo-nav.png" alt="La Percha" class="mnav__logo" width="180" height="116">
+      <span class="logo-script">la Percha</span>
       <button class="icon-btn" data-close-mnav aria-label="Cerrar menú">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
@@ -1470,7 +1638,7 @@ const SITE_URL = location.origin + location.pathname;
 const DEFAULT_SETTINGS = {
   tienda: { nombre: "La Percha", eslogan: "Tienda de ropa exclusiva", direccion: "Cra. 19E2 #13B-46, La Elvira, Valledupar, Cesar",
             mapa: "https://www.google.com/maps?q=10.471250,-73.262222", instagram: "https://www.instagram.com/laperchavup/",
-            tiktok: "https://www.tiktok.com/@lapercha_store17", facebook: "", correo: "", moneda: "COP", locale: "es-CO", logo: "", tema: "oscuro" },
+            tiktok: "https://www.tiktok.com/@lapercha_store17", facebook: "", correo: "", moneda: "COP", locale: "es-CO", logo: "", temaVisual: "claro" },
   whatsapp: { numero: "573144543114", mensajeGeneral: "Hola La Percha, quiero información." },
   catalogo: { permitirSinPrecio: true, porPagina: 24 },
   pagos: {
@@ -1857,7 +2025,14 @@ const ICON = {
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   wa: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.24 8.24 0 1 1 6.99 3.86Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06a6.77 6.77 0 0 1-3.37-2.95c-.14-.25.14-.23.4-.77.04-.08.02-.17-.02-.25-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74 1.57.68 2.19.74 2.97.62.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg>'
 };
+/* Las fotos del catálogo viven en img/catalogo/ y, opcionalmente, en Supabase Storage
+   (bucket "productos", carpeta catalogo/). Admin → Productos → "Subir fotos a Supabase" las copia y activa esta opción. */
+function mediaUrl(src) {
+  const s = String(src || "");
+  return S().catalogo?.fotosEnStorage && /^img\/catalogo\//.test(s) ? `${SUPABASE_URL}/storage/v1/object/public/productos/${s.slice(4)}` : s;
+}
 function img(src, alt, cls = "", attrs = "") {
+  src = mediaUrl(src);
   return `<img src="${esc(src)}" alt="${esc(alt)}" class="${cls}" loading="lazy" decoding="async" ${attrs}>`;
 }
 document.addEventListener("error", e => { if (e.target.tagName === "IMG") e.target.classList.add("broken"); }, true);
@@ -1956,7 +2131,7 @@ function card(p) {
   return `
   <article class="card rv">
     <a href="#/producto/${p.slug}" class="card__media" aria-label="${esc(p.nombre)}">
-      ${p.enOferta ? '<span class="badge badge--sale">Sale</span>' : ""}
+      ${p.enOferta ? '<span class="badge badge--sale">Sale</span>' : p.creado && Date.now() - new Date(p.creado) < 21 * 864e5 ? '<span class="badge badge--new">Nuevo</span>' : ""}
       ${main ? img(Catalog.imageSm(main.src), p.nombre, "main" + (alt ? " has-alt" : "")) : ""}
       ${alt ? img(Catalog.imageSm(alt.src), "", "alt", 'aria-hidden="true"') : ""}
     </a>
@@ -1997,59 +2172,101 @@ function viewError() {
     <p>${esc(friendly(Store.error))}</p><div class="btns"><button class="btn" onclick="location.reload()">Reintentar</button></div></div></section>`;
 }
 
+/* Portada estilo editorial (referencia: clemont.co) adaptada a La Percha */
+const HERO_SLIDES = [
+  { imgs: ["assets/hero/lp-0093.jpg", "assets/hero/lp-0094.jpg", "assets/hero/lp-0095.jpg", "assets/hero/lp-0096.jpg"], kicker: "Nueva temporada", title: "Buzos & Crewnecks", href: "#/categoria/buzos", cta: "Compra ahora" },
+  { imgs: ["assets/hero/lp-0164.jpg", "assets/hero/lp-0165.jpg", "assets/hero/lp-0166.jpg"], kicker: "Calidad 1.1", title: "Conjuntos que hablan solos", href: "#/categoria/conjuntos", cta: "Ver conjuntos" }
+];
+let homeTab = "ropa";
+function railHTML(id, list) {
+  return `<div class="rail" id="${id}">${list.map(p => `<div class="rail__item">${card(p)}</div>`).join("") || '<p class="muted-text">Pronto agregaremos productos.</p>'}</div>`;
+}
+function homeTabList(tab) {
+  const all = Catalog.products();
+  const list = tab === "todo" ? all : all.filter(p => Catalog.groupOf(p) === tab);
+  const feat = list.filter(p => p.destacado);
+  return feat.concat(list.filter(p => !p.destacado)).slice(0, 12);
+}
 function viewHome() {
   const all = Catalog.products(); const t = S().tienda;
-  let feat = all.filter(p => p.destacado);
-  if (feat.length < 4) feat = feat.concat(all.filter(p => !feat.includes(p))).slice(0, 8);
-  const groupTile = (g, src, label, sub) => `<a href="#/${g}" class="tile rv">${img(src, label)}
-      <div class="tile__txt"><div><span class="count-lbl">${all.filter(p => Catalog.groupOf(p) === g).length} productos · ${esc(sub)}</span><h3>${label}</h3></div><span aria-hidden="true">${ICON.arrow}</span></div></a>`;
-  const offers = all.filter(p => p.enOferta);
-  const pagos = PaymentGateway.available().map(m => m.nombre.split(" — ")[0]);
+  const spot = [["camisetas", "Camisetas"], ["conjuntos", "Conjuntos"], ["jeans", "Jeans"], ["buzos", "Buzos"], ["tenis", "Tenis"], ["chanclas", "Chanclas"], ["morrales", "Morrales"], ["billeteras", "Billeteras"]]
+    .map(([slug, label]) => ({ slug, label, n: catCount(slug), cover: catCover(slug) })).filter(c => c.n);
+  const highlight = all.filter(p => Catalog.groupOf(p) === "calzado").slice(0, 8);
+  const insta = ["assets/hero/lp-0095.jpg", "assets/hero/lp-0164.jpg", "assets/hero/lp-0024.jpg", "assets/hero/lp-0166.jpg", "assets/hero/lp-0093.jpg", "assets/hero/lp-0165.jpg"];
+  const arrows = id => `<div class="rail-nav"><button type="button" class="rail-btn" data-rail="${id}" data-dir="-1" aria-label="Anterior">${ICON.left}</button><button type="button" class="rail-btn" data-rail="${id}" data-dir="1" aria-label="Siguiente">${ICON.right}</button></div>`;
   return `
-  <section class="hero hero--brand on-dark" id="hero" aria-label="Portada">
-    <div class="hero__glow" aria-hidden="true"></div>
-    <div class="hero__content wrap">
-      <div class="hero__copy">
-        <p class="eyebrow hero__eyebrow fade-up">Valledupar · Envíos a toda Colombia</p>
-        <h1 class="h-display hero__title"><span class="ln"><span>Viste</span></span><span class="ln"><span class="gold-text">exclusivo.</span></span></h1>
-        <p class="hero__sub fade-up d1">Camisetas, jeans, conjuntos, tenis y accesorios calidad 1.1 seleccionados por ${esc(t.nombre)}. Pide en línea y confirma tu pedido por WhatsApp.</p>
-        <div class="hero__cta fade-up d2"><a href="#/tienda" class="btn">Comprar ahora</a><a href="#/categorias" class="btn btn--outline-light">Ver categorías</a></div>
-      </div>
-      <div class="hero__logo fade-up d1"><img src="assets/logo-la-percha.png" alt="${esc(t.nombre)} — ${esc(t.eslogan)}" width="648" height="563" fetchpriority="high"></div>
-    </div>
-    <div class="hero__scroll fade-up d3" aria-hidden="true">Scroll <i></i></div>
+  <section class="hero hero--slides on-dark" id="hero" aria-label="Portada" aria-roledescription="carrusel">
+    ${HERO_SLIDES.map((s, i) => `<div class="slide ${i === 0 ? "is-on" : ""}" data-slide="${i}" aria-hidden="${i !== 0}">
+      <div class="slide__media cols-${s.imgs.length}">${s.imgs.map((src, k) => `<div class="slide__col"><img src="${esc(src)}" alt="" ${i === 0 && k < 2 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`).join("")}</div>
+      <div class="slide__shade"></div>
+      <div class="hero__content wrap"><p class="eyebrow hero__eyebrow">${esc(s.kicker)}</p>
+        <${i === 0 ? "h1" : "h2"} class="h-display hero__title"><span class="ln"><span>${esc(s.title)}</span></span></${i === 0 ? "h1" : "h2"}>
+        <div class="hero__cta"><a href="${s.href}" class="btn btn--light">${esc(s.cta)}</a><a href="#/tienda" class="btn btn--outline-light">Ver toda la tienda</a></div></div>
+    </div>`).join("")}
+    <div class="slide-dots" role="tablist" aria-label="Diapositivas">${HERO_SLIDES.map((_, i) => `<button type="button" role="tab" aria-label="Diapositiva ${i + 1}" aria-selected="${i === 0}" data-dot="${i}"><i></i></button>`).join("")}</div>
   </section>
-  <section class="section wrap" aria-labelledby="featTitle">
-    <div class="sec-head rv"><div><p class="eyebrow gold">Selección de la casa</p><h2 class="h-section" id="featTitle">Destacados</h2><p>Lo más buscado en ${esc(t.nombre)} esta temporada.</p></div><a href="#/tienda" class="link-u">Ver todo</a></div>
-    <div class="grid">${feat.slice(0, 8).map(card).join("")}</div>
+
+  <section class="section wrap home-pop" aria-labelledby="popTitle">
+    <div class="rail-head rv"><h2 class="h-section sm sr-only" id="popTitle">Lo más pedido</h2>
+      <div class="rail-tabs" role="tablist">${[["ropa", "Ropa"], ["calzado", "Calzado"], ["accesorios", "Accesorios"], ["todo", "Ver todo"]].map(([k, l]) => `<button type="button" role="tab" aria-selected="${homeTab === k}" data-hometab="${k}">${l}</button>`).join("")}</div>
+      ${arrows("railPop")}</div>
+    ${railHTML("railPop", homeTabList(homeTab))}
   </section>
-  <section class="wrap section--tight" aria-label="Líneas"><div class="cats3">
-    ${groupTile("ropa", "img/catalogo/conjuntos/lp-0173.jpg", "Ropa", "camisetas, jeans y conjuntos")}${groupTile("calzado", "img/catalogo/tenis/lp-0382.jpg", "Calzado", "tenis y chanclas")}${groupTile("accesorios", "img/catalogo/morrales/lp-0247.jpg", "Accesorios", "morrales, billeteras y correas")}
-  </div></section>
-  ${offers.length ? `<section class="section wrap" aria-labelledby="saleTitle"><div class="sec-head rv"><div><h2 class="h-section" id="saleTitle">Sale</h2><p>Productos en oferta.</p></div><a href="#/sale" class="link-u">Ver ofertas</a></div><div class="grid">${offers.slice(0, 4).map(card).join("")}</div></section>` : ""}
-  <section class="statement section" aria-label="Cómo comprar en ${esc(t.nombre)}"><div class="wrap statement__in">
-    <p class="eyebrow rv gold" style="align-self:start">${esc(t.nombre)} — ${esc(t.eslogan)}</p>
-    <div class="rv"><h2 class="h-display">Pide en línea. <span class="gold-text">Confirma por WhatsApp.</span></h2>
-      <p style="margin-top:28px">Elige tu producto y tu talla, completa los datos de envío y te confirmamos disponibilidad, valor del envío y pago directamente por WhatsApp.</p>
-      <a href="#/tienda" class="btn">Ver la tienda</a></div>
-  </div></section>
-  <section class="section wrap" aria-labelledby="catTitle">
-    <div class="sec-head rv"><div><h2 class="h-section" id="catTitle">Categorías</h2><p>Todo el catálogo, organizado.</p></div><a href="#/categorias" class="link-u">Ver categorías</a></div>
-    <div class="cat-grid">${activeCategories().slice(0, 8).map(catCard).join("")}</div>
+
+  <section class="section--tight home-spot" aria-labelledby="spotTitle">
+    <div class="wrap rail-head rv"><h2 class="h-section sm" id="spotTitle">Ropa y accesorios</h2>${arrows("railSpot")}</div>
+    <div class="rail rail--spot wrap-left" id="railSpot">${spot.map(c => `<a href="#/categoria/${c.slug}" class="spot rail__item">
+      <span class="spot__img">${img(c.cover, c.label)}</span>
+      <span class="spot__txt"><b>${esc(c.label)}</b><em>Comprar ahora</em></span></a>`).join("")}</div>
   </section>
-  <section class="wrap section--tight" aria-labelledby="visitTitle"><div class="visit rv">
-    <div class="visit__txt"><p class="eyebrow gold">Tienda física</p><h2 class="h-section" id="visitTitle">Visítanos en Valledupar</h2>
-      <p>${esc(t.direccion)}</p>
-      <div class="btns-row"><a class="btn" href="${esc(t.mapa || "https://www.google.com/maps/search/" + encodeURIComponent(t.direccion))}" target="_blank" rel="noopener">Cómo llegar</a><a class="btn btn--ghost" href="${esc(waLink())}" target="_blank" rel="noopener">${ICON.wa} Escríbenos</a></div></div>
-    <img class="visit__logo" src="assets/logo-diamante.png" alt="" loading="lazy" width="648" height="474">
-  </div></section>
-  <section class="wrap section--tight" aria-label="Cómo comprar"><div class="svc rv">
-    <div><h4>Pedidos por WhatsApp</h4><p>Confirmamos cada pedido contigo antes de enviarlo.</p></div>
-    <div><h4>Envíos a toda Colombia</h4><p>Costo y tiempo según tu ciudad.</p></div>
-    <div><h4>Medios de pago</h4><p>${esc(pagos.join(" · ") || "Se coordinan por WhatsApp")}</p></div>
-    <div><h4>Cambios</h4><p>5 días hábiles para cambio de talla. <a class="link-btn" href="#/politicas">Ver políticas</a></p></div>
-  </div></section><div class="section--tight"></div>`;
+
+  <section class="banner on-dark rv" aria-label="Monogram">
+    <div class="banner__media"><img src="assets/hero/lp-0024.jpg" alt="" loading="lazy"><img src="assets/hero/lp-0025.jpg" alt="" loading="lazy"></div>
+    <div class="slide__shade"></div>
+    <div class="banner__txt wrap"><p class="eyebrow">Edición limitada</p><h2 class="h-display">Monogram Collection</h2><a href="#/categoria/camisetas" class="btn btn--light">Compra ahora</a></div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="hlTitle">
+    <div class="rail-head rv"><h2 class="h-section sm" id="hlTitle">Calzado · Tenis y chanclas</h2><a href="#/calzado" class="link-u">Ver más</a></div>
+    <div class="grid">${highlight.map(card).join("")}</div>
+  </section>
+
+  <section class="section--tight insta" aria-labelledby="igTitle">
+    <div class="wrap rail-head rv"><h2 class="h-section sm" id="igTitle"><a href="${esc(t.instagram)}" target="_blank" rel="noopener">@laperchavup</a></h2><a class="link-u" href="${esc(t.instagram)}" target="_blank" rel="noopener">Síguenos en Instagram</a></div>
+    <div class="insta__grid">${insta.map(src => `<a href="${esc(t.instagram)}" target="_blank" rel="noopener" class="insta__item" aria-label="Instagram de ${esc(t.nombre)}"><img src="${src}" alt="" loading="lazy"></a>`).join("")}</div>
+  </section>
+
+  <section class="perks" aria-label="Beneficios"><div class="wrap perks__in">
+    <div class="perk rv"><b>Envíos a toda Colombia</b><span>Costo y tiempo según tu ciudad</span></div>
+    <div class="perk rv"><b>5 días para cambios</b><span><a href="#/politicas#cambios">Ver política de cambios</a></span></div>
+    <div class="perk rv"><b>Pagos seguros</b><span>${esc(PaymentGateway.available().map(m => m.nombre.split(" — ")[0]).join(" · "))}</span></div>
+    <div class="perk rv"><b>Tienda en Valledupar</b><span><a href="${esc(t.mapa)}" target="_blank" rel="noopener">${esc(t.direccion)}</a></span></div>
+  </div></section>`;
 }
+function mountHome() {
+  const hero = $("#hero"); if (!hero) return;
+  const slides = $$(".slide", hero), dots = $$("[data-dot]", hero); let cur = 0, timer;
+  const show = i => {
+    cur = (i + slides.length) % slides.length;
+    slides.forEach((s, k) => { s.classList.toggle("is-on", k === cur); s.setAttribute("aria-hidden", k !== cur); });
+    dots.forEach((d, k) => d.setAttribute("aria-selected", k === cur));
+  };
+  const play = () => { clearInterval(timer); if (!matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(() => { if (!document.hidden && $("#hero") === hero) show(cur + 1); else if (!document.contains(hero)) clearInterval(timer); }, 6500); };
+  dots.forEach(d => d.onclick = () => { show(+d.dataset.dot); play(); });
+  const first = $(".slide.is-on img", hero);
+  const go = () => setTimeout(() => hero.classList.add("ready"), 30);
+  first && !first.complete ? (first.onload = go, first.onerror = go, setTimeout(go, 1500)) : go();
+  play();
+  $$("[data-hometab]").forEach(b => b.onclick = () => {
+    homeTab = b.dataset.hometab; $$("[data-hometab]").forEach(x => x.setAttribute("aria-selected", x === b));
+    const rail = $("#railPop"); rail.outerHTML = railHTML("railPop", homeTabList(homeTab)); reveal();
+  });
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-rail]"); if (!b) return;
+  const rail = document.getElementById(b.dataset.rail); if (!rail) return;
+  rail.scrollBy({ left: +b.dataset.dir * rail.clientWidth * 0.85, behavior: "smooth" });
+});
 
 /* ---------- Políticas (envíos, cambios, garantía y datos) — texto base para revisión del cliente ---------- */
 function viewPolicies() {
@@ -2966,7 +3183,7 @@ const Admin = {
     const nuevos = AdminData.orders.filter(o => o.estado === "nuevo").length; const unread = AdminData.unread();
     const links = [["", "Resumen"], ["ventas", "Ventas"], ["pedidos", "Pedidos", nuevos], ["productos", "Productos"], ["inventario", "Inventario"], ["clientes", "Clientes"],
       ["facturacion", "Facturación"], ["notificaciones", "Notificaciones", unread, "notifNav"], ["estadisticas", "Estadísticas"], ["ajustes", "Configuración"]];
-    return `<div class="adm"><aside class="adm__side"><span class="adm__logo">${brandMark()}</span><small>Administración</small>
+    return `<div class="adm"><aside class="adm__side"><span class="adm__logo"><img src="assets/logo-nav.png" alt="${esc(S().tienda.nombre)}" width="180" height="116"></span><small>Administración</small>
         ${links.map(([k, l, n, id]) => `<a href="#/admin${k ? "/" + k : ""}" ${active === k ? 'aria-current="page"' : ""}>${l}<em ${id ? `id="${id}"` : ""} ${n ? "" : "hidden"}>${n || ""}</em></a>`).join("")}
         <div class="bottom"><a href="#/" target="_blank" rel="noopener">Ver tienda ↗</a><a href="#" id="admLogout">Cerrar sesión</a></div></aside>
       <div class="adm__main">
@@ -3214,7 +3431,7 @@ const Admin = {
   products(query) {
     const st = this.prodState; if (query?.f) st.f = query.f;
     return this.shell("productos", `<div class="adm__head"><div><h1>Productos</h1><p>${Store.products.length} productos · ${Store.products.filter(p => Catalog.isShown(p)).length} visibles en la tienda.</p></div>
-      <div class="head-actions"><button class="btn btn--ghost" id="expCat">Exportar JSON</button><label class="btn btn--ghost" style="cursor:pointer">Importar JSON<input type="file" id="impCat" accept="application/json,.json" hidden></label><a class="btn" href="#/admin/productos/nuevo">+ Nuevo producto</a></div></div>
+      <div class="head-actions"><button class="btn btn--ghost" id="upPhotos">${S().catalogo?.fotosEnStorage ? "Fotos en Supabase ✓ (volver a subir)" : "Subir fotos a Supabase"}</button><button class="btn btn--ghost" id="expCat">Exportar JSON</button><label class="btn btn--ghost" style="cursor:pointer">Importar JSON<input type="file" id="impCat" accept="application/json,.json" hidden></label><a class="btn" href="#/admin/productos/nuevo">+ Nuevo producto</a></div></div>
       ${!Store.products.length ? `<div class="adm-note info"><span>El catálogo en Supabase está vacío. Carga el catálogo inicial de La Percha (fotos, tallas y precios de su catálogo web) con un clic. Después registra el stock real en Inventario.</span> <button class="btn" id="seedCat">Cargar catálogo inicial</button></div>` : ""}
       <div class="tools"><input type="search" id="pq" placeholder="Buscar por nombre o referencia" value="${esc(st.q)}" aria-label="Buscar productos">
         <select id="pcat" aria-label="Categoría"><option value="">Todas las categorías</option>${Store.categories.map(c => `<option value="${c.slug}" ${st.cat === c.slug ? "selected" : ""}>${esc(c.nombre)}</option>`).join("")}</select>
@@ -3264,6 +3481,7 @@ const Admin = {
       } catch (err) { alert("No se pudo importar: " + friendly(err)); }
       e.target.value = "";
     };
+    $("#upPhotos").onclick = () => uploadCatalogPhotos();
     $("#seedCat") && ($("#seedCat").onclick = async () => {
       try { const res = await fetch(CATALOG_SEED_URL, { cache: "no-store" }); if (!res.ok) throw new Error("No se encontró " + CATALOG_SEED_URL); const data = await res.json(); await importProducts(data.productos, { withCost: false }); }
       catch (err) { toast(friendly(err)); }
@@ -3610,7 +3828,7 @@ const Admin = {
           ${f("t_mapa", "Enlace de Google Maps", s.tienda.mapa, "url")}${f("t_correo", "Correo de contacto", s.tienda.correo, "email", 'placeholder="Pendiente"')}
           ${f("t_ig", "Instagram (URL)", s.tienda.instagram, "url")}${f("t_tt", "TikTok (URL)", s.tienda.tiktok, "url")}
           ${f("t_fb", "Facebook (URL, opcional)", s.tienda.facebook, "url")}${f("t_logo", "Logo (URL de imagen, opcional)", s.tienda.logo, "text", 'placeholder="Vacío = logo de La Percha"')}
-          <div class="field"><label for="t_tema">Tema de la tienda</label><select id="t_tema" name="t_tema"><option value="oscuro" ${s.tienda.tema !== "claro" ? "selected" : ""}>Oscuro y dorado (recomendado)</option><option value="claro" ${s.tienda.tema === "claro" ? "selected" : ""}>Claro con dorado</option></select></div>
+          <div class="field"><label for="t_tema">Tema de la tienda</label><select id="t_tema" name="t_tema"><option value="claro" ${s.tienda.temaVisual !== "oscuro" ? "selected" : ""}>Claro editorial (recomendado)</option><option value="oscuro" ${s.tienda.temaVisual === "oscuro" ? "selected" : ""}>Oscuro y dorado</option></select></div>
         </div></div>
         <div class="card-w"><h2>Pedidos y envíos</h2><div class="fg">
           ${f("o_prefijo", "Prefijo del número de pedido", s.pedidos.prefijo)}
@@ -3653,7 +3871,7 @@ const Admin = {
       if (!/^\d{11,15}$/.test(wa)) { toast("Número de WhatsApp no válido. Usa el formato 573XXXXXXXXX."); return; }
       s.whatsapp.numero = wa; s.whatsapp.mensajeGeneral = fd.wa_msg.trim() || DEFAULT_SETTINGS.whatsapp.mensajeGeneral;
       s.tienda.nombre = fd.t_nombre.trim() || "La Percha"; s.tienda.eslogan = fd.t_eslogan.trim(); s.tienda.direccion = fd.t_dir.trim(); s.tienda.instagram = fd.t_ig.trim(); s.tienda.logo = fd.t_logo.trim();
-      s.tienda.tiktok = fd.t_tt.trim(); s.tienda.facebook = fd.t_fb.trim(); s.tienda.mapa = fd.t_mapa.trim(); s.tienda.correo = fd.t_correo.trim(); s.tienda.tema = fd.t_tema === "claro" ? "claro" : "oscuro";
+      s.tienda.tiktok = fd.t_tt.trim(); s.tienda.facebook = fd.t_fb.trim(); s.tienda.mapa = fd.t_mapa.trim(); s.tienda.correo = fd.t_correo.trim(); s.tienda.temaVisual = fd.t_tema === "oscuro" ? "oscuro" : "claro";
       if (s.pagos.addi) { s.pagos.addi.widgetSlug = (fd.addi_slug || "").trim(); s.pagos.addi.widgetScript = (fd.addi_script || "").trim(); }
       s.pedidos.prefijo = fd.o_prefijo.trim() || "LP-"; s.pedidos.costoEnvio = fd.o_envio === "" ? null : Math.max(0, Math.round(Number(fd.o_envio)));
       s.pedidos.textoEnvio = fd.o_texto.trim(); s.pedidos.politicaCambios = fd.o_cambios.trim();
@@ -4098,6 +4316,31 @@ async function importProducts(items, { withCost }) {
   if (box) box.hidden = true;
   await Api.loadCatalog({ admin: true }); render();
 }
+/* Copia las fotos de la carpeta img/catalogo (elegida desde el computador) a Supabase Storage,
+   bucket "productos", carpeta catalogo/. Así las fotos se ven aunque el hosting no tenga la carpeta img/. */
+function uploadCatalogPhotos() {
+  openModal("Subir fotos del catálogo a Supabase", `<p style="margin:0 0 12px;font-size:14px">Selecciona la carpeta <b>img/catalogo</b> del proyecto de La Percha en este computador.
+    Se suben solo las fotos (.jpg) y se reemplazan si ya existen. Puede tardar varios minutos: no cierres esta ventana.</p>
+    <label class="btn btn--block" style="cursor:pointer">Elegir carpeta img/catalogo<input type="file" id="phDir" webkitdirectory directory multiple hidden></label>
+    <p class="form-msg ok" id="phMsg" role="status" style="margin-top:12px"></p>`);
+  $("#phDir").onchange = async e => {
+    const files = [...e.target.files].filter(f => /\.jpe?g$/i.test(f.name) && /(^|\/)catalogo\//.test(f.webkitRelativePath));
+    const msg = t => { const el = $("#phMsg"); if (el) el.textContent = t; };
+    if (!files.length) return msg("No encontré fotos .jpg dentro de una carpeta llamada “catalogo”. Elige la carpeta img/catalogo.");
+    let done = 0, fail = 0; const queue = files.slice();
+    const worker = async () => { for (let f; (f = queue.shift());) {
+      const path = f.webkitRelativePath.slice(f.webkitRelativePath.indexOf("catalogo/"));
+      const { error } = await sb.storage.from("productos").upload(path, f, { contentType: "image/jpeg", upsert: true, cacheControl: "31536000" });
+      error ? fail++ : done++; msg(`Subiendo… ${done + fail} / ${files.length}${fail ? ` (${fail} con error)` : ""}`);
+    } };
+    await Promise.all([1, 2, 3, 4].map(worker));
+    if (done === 0) return msg(`No se pudo subir ninguna foto. Revisa que tu cuenta sea administradora y que el bucket “productos” exista (supabase/01_schema.sql).`);
+    const s = structuredClone(S()); s.catalogo = { ...s.catalogo, fotosEnStorage: true };
+    try { await Api.saveSettings(s); } catch (err) { return msg(friendly(err)); }
+    msg(`Listo: ${done} fotos subidas${fail ? ` y ${fail} con error (vuelve a intentarlo para completarlas)` : ""}. La tienda ya usa las fotos de Supabase.`);
+    toast("Fotos del catálogo en Supabase"); render();
+  };
+}
 function validProduct(p) { return p && typeof p.nombre === "string" && typeof p.categoria === "string" && Array.isArray(p.variantes) && p.variantes.length > 0; }
 function download(name, text) {
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "application/json" })); a.download = name;
@@ -4398,12 +4641,15 @@ async function render() {
   if (changed) { scrollTo({ top: 0, behavior: "instant" }); if (r.name !== "home") app.focus({ preventScroll: true }); } else scrollTo({ top: y, behavior: "instant" });
   onScroll(); reveal();
 }
-function mountHome() { const hero = $("#hero"); if (!hero) return; const im = $(".hero__logo img", hero); const go = () => setTimeout(() => hero.classList.add("ready"), 30); im.complete ? go() : (im.onload = go, im.onerror = go, setTimeout(go, 1500)); }
+/* mountHome: ver portada */
 const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px", threshold: .08 }) : null;
 function reveal() { $$(".rv:not(.in)").forEach(el => io ? io.observe(el) : el.classList.add("in")); }
 let lastY = 0;
 function onScroll() {
   const y = scrollY, nav = $("#nav"), hero = $("#hero");
+  document.body.classList.toggle("scrolled", y > 34);
+  /* Respaldo del IntersectionObserver: revela lo que ya está en pantalla */
+  const vh = innerHeight; $$(".rv:not(.in)").forEach(el => { if (el.getBoundingClientRect().top < vh * .95) el.classList.add("in"); });
   nav.classList.toggle("on-dark", !!(hero && y < hero.offsetHeight - 90));
   const menuOpen = $(".mnav.open, .drawer.open, .search.open");
   nav.classList.toggle("hide", !menuOpen && y > 400 && y > lastY + 4);
@@ -4496,13 +4742,15 @@ function subscribeRealtime() {
 /* Logo de la marca (PNG transparente en dorado). Si se configura otro logo en Admin, se usa ese. */
 function brandMark(cls = "") {
   const s = S().tienda;
-  return `<img src="${esc(s.logo || "assets/logo-nav.png")}" alt="${esc(s.nombre)}" class="${cls}" width="180" height="116">`;
+  if (s.logo) return `<img src="${esc(s.logo)}" alt="${esc(s.nombre)}" class="${cls}" width="180" height="116">`;
+  return `<span class="logo-script ${cls}" aria-label="${esc(s.nombre)}">la Percha</span>`;
 }
 function applyBranding() {
   const s = S();
   $("#brand").innerHTML = brandMark("brand__img");
+  document.body.classList.add("theme-ready");
   /* Tema: oscuro (por defecto, como el logo) o claro (Admin → Configuración) */
-  document.body.classList.toggle("theme-light", s.tienda.tema === "claro");
+  document.body.classList.toggle("theme-light", s.tienda.temaVisual !== "oscuro");
   $$("[data-wordmark], [data-wordmark-plain], [data-store-name]").forEach(el => el.textContent = s.tienda.nombre);
   $$("[data-slogan]").forEach(el => el.textContent = s.tienda.eslogan);
   $$("[data-address]").forEach(el => el.textContent = s.tienda.direccion);
