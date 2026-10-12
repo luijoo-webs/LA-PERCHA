@@ -1497,6 +1497,41 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
 .foot__dir:hover{color:#fff}
 .link-plain{color:var(--muted);font-size:13.5px;text-decoration:underline;text-underline-offset:3px}
 .link-plain:hover{color:var(--ink)}
+
+/* Filtros: columna con scroll propio + filtro de público */
+@media (min-width:961px){
+  .shop .filters{max-height:calc(100vh - var(--nav-h) - 48px);overflow-y:auto;overscroll-behavior:contain;padding-right:14px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+  .shop .filters::-webkit-scrollbar{width:6px}.shop .filters::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
+  .shop .filters::after{content:"";display:block;height:12px}
+}
+.gender-filter{display:flex;flex-wrap:wrap;gap:6px}
+.gender-filter label{cursor:pointer}
+.gender-filter input{position:absolute;opacity:0;pointer-events:none}
+.gender-filter span{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--line);font:600 12px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;transition:all .2s;background:var(--paper)}
+.gender-filter small{font-size:10.5px;color:var(--muted);font-weight:500}
+.gender-filter label:hover span{border-color:var(--ink)}
+.gender-filter input:checked+span{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.gender-filter input:checked+span small{color:inherit;opacity:.7}
+.gender-filter input:focus-visible+span{outline:2px solid var(--ink);outline-offset:2px}
+.gender-filter .is-empty span{opacity:.5}
+
+/* Tienda física: franja oscura con mapa */
+.visit2{position:relative;background:#0f0f0f;color:#f3eee4;overflow:hidden;margin-top:clamp(40px,5vw,72px);padding-block:clamp(56px,7vw,104px)}
+.visit2::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 15% 30%,rgba(201,162,78,.14),transparent 65%);pointer-events:none}
+.visit2__in{position:relative;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(28px,5vw,80px);align-items:center}
+.visit2__logo{height:64px;width:auto;margin-bottom:22px}
+.visit2 .eyebrow{color:#c9a24e}
+.visit2__title{font-size:clamp(38px,4.6vw,72px);color:#fff;margin:14px 0 26px}
+.visit2__info{list-style:none;margin:0 0 30px;padding:0;display:grid;gap:16px}
+.visit2__info li{display:grid;grid-template-columns:20px 1fr;gap:14px;align-items:start;font-size:14.5px;color:rgba(243,238,228,.78)}
+.visit2__info svg{color:#c9a24e;margin-top:2px}
+.visit2__info b{display:block;font:600 11px/1.2 var(--f-display);letter-spacing:.18em;text-transform:uppercase;color:#fff;margin-bottom:4px}
+.visit2__map .minimap{aspect-ratio:4/3.2;border:0;box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08);transform:rotate(-1deg);transition:transform .6s var(--ease-out)}
+.visit2__map .minimap:hover{transform:rotate(0) scale(1.01)}
+.visit2__map .minimap iframe{filter:grayscale(.2) contrast(1.05)}
+.visit2 .btn--light:hover{color:#111}
+.visit2 .btn--light::before{background:#c9a24e}
+@media (max-width:860px){.visit2__in{grid-template-columns:1fr}.visit2__map .minimap{transform:none;aspect-ratio:4/3}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -2305,11 +2340,19 @@ function viewHome() {
     <div class="insta__grid">${insta.map(src => `<a href="${esc(t.instagram)}" target="_blank" rel="noopener" class="insta__item" aria-label="Instagram de ${esc(t.nombre)}">${img(src, "")}</a>`).join("")}</div>
   </section>
 
-  <section class="section--tight wrap" aria-labelledby="storeTitle"><div class="store rv">
-    <div class="store__txt"><p class="eyebrow">Tienda física</p><h2 class="h-section sm" id="storeTitle">Visítanos en Valledupar</h2>
-      <p class="store__addr">${esc(t.direccion)}</p>
-      <div class="btns-row"><button type="button" class="btn" data-directions>Cómo llegar</button><a class="btn btn--ghost" href="${esc(waLink())}" target="_blank" rel="noopener">${ICON.wa} Escríbenos</a></div></div>
-    ${miniMap()}
+  <section class="visit2 on-dark" aria-labelledby="storeTitle"><div class="wrap visit2__in">
+    <div class="visit2__txt rv">
+      <img class="visit2__logo" src="assets/logo-header.png" alt="" width="420" height="291" loading="lazy">
+      <p class="eyebrow">Tienda física · Valledupar</p>
+      <h2 class="h-display visit2__title" id="storeTitle">Ven a medírtelo<br>en persona.</h2>
+      <ul class="visit2__info">
+        <li><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg><span><b>Dirección</b>${esc(t.direccion)}</span></li>
+        <li>${ICON.wa}<span><b>WhatsApp</b>${esc(String(storeWhatsApp()).replace(/^57(\d{3})(\d{3})(\d{4})$/, "$1 $2 $3"))}</span></li>
+        <li><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6.5h11v9H3zM14 9.5h3.5L21 13v2.5h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><span><b>Envíos</b>A toda Colombia desde Valledupar</span></li>
+      </ul>
+      <div class="btns-row"><button type="button" class="btn btn--light" data-directions>Cómo llegar</button><a class="btn btn--outline-light" href="${esc(waLink())}" target="_blank" rel="noopener">${ICON.wa} Escríbenos</a></div>
+    </div>
+    <div class="visit2__map rv">${miniMap()}</div>
   </div></section>
 
   <section class="perks" aria-label="Beneficios"><div class="wrap perks__in">
@@ -2370,7 +2413,10 @@ const PRICE_RANGES = [
   { id: "p3", label: "$ 120.000 – $ 180.000", min: 120000, max: 180000 }, { id: "p4", label: "Más de $ 180.000", min: 180000, max: Infinity },
   { id: "p0", label: "Precio a confirmar", ask: true }
 ];
-const emptyFilters = () => ({ cats: [], price: "", sizes: [], colors: [], sale: false, sort: "new", page: 1 });
+const emptyFilters = () => ({ gens: [], cats: [], price: "", sizes: [], colors: [], sale: false, sort: "new", page: 1 });
+/* Público del producto (Admin → Productos → "Público"). Sin marcar = Hombre, porque el catálogo es principalmente masculino. */
+const GENDERS = [["hombre", "Hombre"], ["mujer", "Mujer"], ["nino", "Niños"]];
+const genderOf = p => p.genero || "hombre";
 let filters = emptyFilters();
 
 function searchProducts(q, list = Catalog.products()) {
@@ -2397,7 +2443,7 @@ function matchPrice(p, id) {
 }
 function applyFilters(list) {
   const f = filters;
-  const out = list.filter(p => (!f.cats.length || f.cats.includes(p.categoria)) && (!f.sale || p.enOferta) && (!f.price || matchPrice(p, f.price)) &&
+  const out = list.filter(p => (!f.gens.length || f.gens.includes(genderOf(p))) && (!f.cats.length || f.cats.includes(p.categoria)) && (!f.sale || p.enOferta) && (!f.price || matchPrice(p, f.price)) &&
     (!f.sizes.length || p.variantes.some(v => f.sizes.includes(v.talla) && Catalog.stockOf(v) > 0)) &&
     (!f.colors.length || (p.colores || []).some(c => f.colors.includes(c.nombre))));
   out.sort((a, b) => {
@@ -2416,6 +2462,8 @@ function filtersHTML(base, cfg, idp) {
   const sizes = [...new Set(base.flatMap(p => p.variantes.filter(v => Catalog.stockOf(v) > 0).map(v => v.talla)))].sort((a, b) => sizeRank(a) - sizeRank(b));
   const colors = []; base.forEach(p => (p.colores || []).forEach(c => { if (!colors.find(x => x.nombre === c.nombre)) colors.push(c); }));
   return `
+  <div class="fgroup"><h3>Público</h3><div class="gender-filter">${GENDERS.map(([k, l]) => { const n = cnt(p => genderOf(p) === k);
+    return `<label class="${n ? "" : "is-empty"}"><input type="checkbox" name="gen" value="${k}" ${filters.gens.includes(k) ? "checked" : ""}><span>${l}<small>${n}</small></span></label>`; }).join("")}</div></div>
   ${!cfg.fixedCat && cats.length > 1 ? `<div class="fgroup"><h3>Categoría</h3>${cats.map(c => `<label class="check"><input type="checkbox" name="cat" value="${esc(c)}" ${filters.cats.includes(c) ? "checked" : ""}> ${esc(Catalog.categoryName(c))} <small>${cnt(p => p.categoria === c)}</small></label>`).join("")}</div>` : ""}
   <div class="fgroup"><h3>Precio</h3><label class="check"><input type="radio" name="${idp}price" data-price="" ${!filters.price ? "checked" : ""}> Todos</label>
     ${PRICE_RANGES.map(r => { const n = cnt(p => matchPrice(p, r.id)); return n ? `<label class="check"><input type="radio" name="${idp}price" data-price="${r.id}" ${filters.price === r.id ? "checked" : ""}> ${r.label} <small>${n}</small></label>` : ""; }).join("")}</div>
@@ -2451,7 +2499,8 @@ function mountList(route) {
   };
   const onChange = e => {
     const t = e.target; const toggle = (arr, v, on) => on ? [...new Set([...arr, v])] : arr.filter(x => x !== v);
-    if (t.name === "cat") filters.cats = toggle(filters.cats, t.value, t.checked);
+    if (t.name === "gen") filters.gens = toggle(filters.gens, t.value, t.checked);
+    else if (t.name === "cat") filters.cats = toggle(filters.cats, t.value, t.checked);
     else if (t.name === "size") filters.sizes = toggle(filters.sizes, t.value, t.checked);
     else if (t.name === "color") filters.colors = toggle(filters.colors, t.value, t.checked);
     else if (t.dataset.price !== undefined) filters.price = t.dataset.price;
