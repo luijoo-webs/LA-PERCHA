@@ -1556,6 +1556,9 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
 .olink__box p{margin:3px 0;font-size:14.5px}
 .olink__actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 @media (max-width:720px){.olink__item{grid-template-columns:1fr}.olink__grid{grid-template-columns:1fr}.olink__total{justify-items:start}}
+
+.pay-card{border-color:#b9d8c3;background:#f3faf5}
+.pay-note{margin:8px 0 10px;padding:10px 12px;background:#fff;border:1px solid var(--line);font-size:14px;white-space:pre-wrap}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -1786,15 +1789,12 @@ const PAYMENT_PROVIDERS = {
   bancolombia:   { integrado: true, nombre: "Transferencia Bancolombia" },
   addi:          { integrado: true, nombre: "Addi — paga a cuotas" }
 };
-const ORDER_STATUS = { nuevo: "Nuevo", confirmado: "Confirmado", pago_pendiente: "Pago pendiente", pagado: "Pagado",
+const ORDER_STATUS = { nuevo: "Nuevo", confirmado: "Confirmado", pago_pendiente: "Pendiente de pago", pagado: "Pagado",
   preparando: "Preparando", enviado: "Enviado", entregado: "Entregado", cancelado: "Cancelado" };
 /* Debe coincidir con admin_set_order_status (supabase/01_schema.sql) */
-const PREPAID_FLOW = ["nuevo", "confirmado", "pago_pendiente", "pagado", "preparando", "enviado", "entregado"];
-const ORDER_FLOWS = {
-  contraentrega: ["nuevo", "confirmado", "preparando", "enviado", "entregado"],
-  efectivo: ["nuevo", "confirmado", "preparando", "enviado", "entregado"],
-  transferencia: PREPAID_FLOW, bancolombia: PREPAID_FLOW, nequi: PREPAID_FLOW, daviplata: PREPAID_FLOW, addi: PREPAID_FLOW
-};
+/* Debe coincidir con admin_set_order_status (supabase/07_pago_y_correo_pedido.sql) */
+const ORDER_FLOW = ["pago_pendiente", "pagado", "preparando", "enviado", "entregado"];
+const ORDER_FLOWS = new Proxy({}, { get: () => ORDER_FLOW });
 /* Guías de tallas (imagen en catalogo/guias/). Vacío hasta que La Percha entregue sus guías. */
 const SIZE_GUIDES = {};
 const GROUPS = { ropa: "Ropa", calzado: "Calzado", accesorios: "Accesorios" };
@@ -2087,7 +2087,7 @@ function orderWhatsAppText(o) {
   L.push(`*PEDIDO ${S().tienda.nombre.toUpperCase()}*`);
   L.push(`Número de pedido: ${o.numero}`);
   L.push(`Fecha: ${fmtDate(o.created_at)}`);
-  if (o.link_token) { L.push(""); L.push("📸 *Ver el pedido con fotos:*"); L.push(orderLinkUrl(o.link_token)); }
+  if (o.link_token) { L.push(""); L.push("*Ver el pedido con fotos:*"); L.push(orderLinkUrl(o.link_token)); }
   L.push("");
   L.push("*Cliente*");
   L.push(`Nombre: ${c.nombre}`);
@@ -3478,7 +3478,7 @@ function seriesByDay(orders, range, valueFn) {
 
 const Admin = {
   shell(active, content) {
-    const nuevos = AdminData.orders.filter(o => o.estado === "nuevo").length; const unread = AdminData.unread();
+    const nuevos = AdminData.orders.filter(o => ["nuevo", "pago_pendiente"].includes(o.estado)).length; const unread = AdminData.unread();
     const links = [["", "Resumen"], ["ventas", "Ventas"], ["pedidos", "Pedidos", nuevos], ["productos", "Productos"], ["inventario", "Inventario"], ["clientes", "Clientes"],
       ["facturacion", "Facturación"], ["notificaciones", "Notificaciones", unread, "notifNav"], ["estadisticas", "Estadísticas"], ["ajustes", "Configuración"]];
     return `<div class="adm"><aside class="adm__side"><span class="adm__logo"><img src="assets/logo-nav.png" alt="${esc(S().tienda.nombre)}" width="180" height="116"></span><small>Administración</small>
@@ -3662,7 +3662,7 @@ const Admin = {
   order(num) {
     const o = AdminData.order(num); if (!o) return this.shell("pedidos", `<p>El pedido ${esc(num)} no existe o fue eliminado. <a class="link-btn" href="#/admin/pedidos">Volver</a></p>`);
     const flow = ORDER_FLOWS[o.metodo_pago] || ORDER_FLOWS.contraentrega;
-    const ci = flow.indexOf(o.estado); const next = o.estado !== "cancelado" && ci >= 0 && ci < flow.length - 1 ? flow[ci + 1] : null;
+    const ci = flow.indexOf(o.estado); const next = o.estado === "cancelado" ? null : ci < 0 ? "pagado" : ci < flow.length - 1 ? flow[ci + 1] : null;
     const g = this.orderProfit(o); const reserved = o.order_items.reduce((a, i) => a + i.stock_descontado, 0);
     const custMsg = `Hola ${String(o.cliente.nombre).split(" ")[0]}, te escribimos de ${S().tienda.nombre} sobre tu pedido ${o.numero}. Estado actual: ${ORDER_STATUS[o.estado]}.`;
     return this.shell("pedidos", `<div class="adm__head"><div><p style="margin:0 0 6px"><a href="#/admin/pedidos" class="link-btn">← Pedidos</a></p><h1>${esc(o.numero)}</h1><p>${fmtDate(o.created_at)} · ${esc(PaymentGateway.label(o.metodo_pago))}</p></div>${statusPill(o.estado)}</div>
@@ -3687,6 +3687,12 @@ const Admin = {
           <p class="muted-text" style="margin:0">${esc(o.cliente.info_adicional || "Sin información adicional")}</p>
           <p style="margin:12px 0 0">${o.user_id ? '<span class="tag dark">Cliente registrado</span>' : '<span class="tag">Compra como invitado</span>'}</p></div>
       </div><div>
+        ${o.pagado_at || o.pago_nota || o.pago_comprobante ? `<div class="card-w pay-card"><h2>Pago registrado</h2>
+          <p style="margin:0 0 6px">${o.pagado_at ? fmtDate(o.pagado_at) : ""}${o.pago_registrado_por ? " · " + esc(o.pago_registrado_por) : ""}</p>
+          ${o.pago_nota ? `<p class="pay-note">${esc(o.pago_nota)}</p>` : ""}
+          ${o.pago_comprobante ? `<button type="button" class="btn btn--ghost btn--sm" id="viewProof">Ver comprobante</button>` : '<p class="muted-text" style="font-size:13px;margin:0">Sin comprobante adjunto.</p>'}
+          <div class="btns-row" style="margin-top:12px"><button type="button" class="btn btn--ghost btn--sm" id="sendThanks" ${o.cliente?.email ? "" : "disabled"}>${o.email_gracias_at ? "Reenviar correo de agradecimiento" : "Enviar correo de agradecimiento"}</button></div>
+          <p class="form-msg ${o.email_gracias_at ? "ok" : ""}" id="thanksMsg">${o.email_gracias_at ? "Correo enviado el " + fmtDate(o.email_gracias_at) : o.cliente?.email ? "" : "El cliente no dejó correo: no se puede enviar el agradecimiento."}</p></div>` : ""}
         <div class="card-w"><h2>Estado del pedido</h2>${statusFlow(o)}
           <div class="stack">
             ${next ? `<button class="btn" data-status="${next}">Marcar como: ${ORDER_STATUS[next]}</button>` : ""}
@@ -3708,9 +3714,20 @@ const Admin = {
     const apply = async estado => {
       if (estado === o.estado) return;
       if (estado === "cancelado" && !confirm(`¿Cancelar el pedido ${o.numero}? Las unidades descontadas vuelven al inventario.`)) return;
+      if (estado === "pagado") return openPaymentForm(o);
       try { await rpc("admin_set_order_status", { p_order_id: o.id, p_estado: estado }); toast("Estado actualizado: " + ORDER_STATUS[estado]); await AdminData.load(); render(); }
       catch (e) { toast(friendly(e)); }
     };
+    $("#viewProof") && ($("#viewProof").onclick = async () => {
+      const { data, error } = await sb.storage.from("comprobantes").createSignedUrl(o.pago_comprobante, 600);
+      if (error) return toast(friendly(error)); window.open(data.signedUrl, "_blank", "noopener");
+    });
+    $("#sendThanks") && ($("#sendThanks").onclick = async e => {
+      const b = e.currentTarget; b.disabled = true; const m = $("#thanksMsg"); m.className = "form-msg ok"; m.textContent = "Enviando correo…";
+      try { const to = await sendThanksEmail(o); m.textContent = "Correo enviado a " + to; toast("Correo de agradecimiento enviado"); await AdminData.load(); }
+      catch (err) { m.className = "form-msg"; m.textContent = err.message; }
+      b.disabled = false;
+    });
     $$("[data-status]").forEach(b => b.onclick = () => apply(b.dataset.status));
     $("#applyStatus").onclick = () => apply($("#setStatus").value);
     $("#saveNote").onclick = async () => { try { await rpc("admin_update_order_note", { p_order_id: o.id, p_nota: $("#orderNote").value }); o.nota_admin = $("#orderNote").value; toast("Nota guardada"); } catch (e) { toast(friendly(e)); } };
@@ -4682,6 +4699,62 @@ async function resizeImage(file, max) {
   return new Promise(r => c.toBlob(r, "image/jpeg", 0.85));
 }
 /* =========================================================================
+   PAGO DE PEDIDOS ONLINE: formulario (comprobante opcional + nota) y correo
+   "¡Gracias por tu compra!" al cliente (Edge Function enviar-correo-pedido)
+   ========================================================================= */
+function openPaymentForm(o) {
+  const email = o.cliente?.email || "";
+  openModal(`Registrar pago · ${o.numero}`, `<form id="payRegForm" class="stack" novalidate>
+    <p style="margin:0;font-size:14px">${esc(o.cliente?.nombre || "")} · <b>${money(o.total)}</b> · ${esc(PaymentGateway.label(o.metodo_pago))}</p>
+    <div class="field"><label for="prFile">Comprobante de pago (opcional)</label><input id="prFile" type="file" accept="image/*,application/pdf"><span class="hint">Foto o captura de la transferencia, o un PDF.</span></div>
+    <div class="field"><label for="prNote">Nota (opcional)</label><textarea id="prNote" placeholder="Ej.: Pagó por Nequi, referencia 12345"></textarea></div>
+    <label class="check-row"><input type="checkbox" id="prMail" ${email ? "checked" : "disabled"}> ${email ? `Enviar correo de agradecimiento a <b>${esc(email)}</b> con los productos y el comprobante en PDF` : "El cliente no dejó correo: no se enviará agradecimiento"}</label>
+    <p class="form-msg" id="prMsg" role="status"></p>
+    <div class="co-actions"><button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button><button class="btn" type="submit" id="prSave">Marcar como pagado</button></div>
+  </form>`);
+  $("#payRegForm").onsubmit = async e => {
+    e.preventDefault(); const msg = (t, ok) => { const el = $("#prMsg"); if (el) { el.textContent = t; el.classList.toggle("ok", !!ok); } };
+    const btn = $("#prSave"); btn.disabled = true;
+    try {
+      let path = null; const file = $("#prFile").files[0];
+      if (file) {
+        if (file.size > 10 * 1024 * 1024) throw new Error("El comprobante pesa más de 10 MB.");
+        msg("Subiendo comprobante…", true);
+        const blob = /^image\//.test(file.type) ? await resizeImage(file, 1600) : file;
+        const ext = /pdf/.test(file.type) ? "pdf" : "jpg";
+        path = `${o.numero}/${Date.now().toString(36)}.${ext}`;
+        const { error } = await sb.storage.from("comprobantes").upload(path, blob, { contentType: ext === "pdf" ? "application/pdf" : "image/jpeg", upsert: false });
+        if (error) throw error;
+      }
+      msg("Registrando pago…", true);
+      await rpc("admin_register_payment", { p_order_id: o.id, p_comprobante: path, p_nota: $("#prNote").value.trim() || null });
+      let mailTxt = "";
+      if ($("#prMail")?.checked) {
+        msg("Enviando correo de agradecimiento…", true);
+        try { const to = await sendThanksEmail({ ...o, estado: "pagado" }); mailTxt = ` · Correo enviado a ${to}`; }
+        catch (err) { mailTxt = ` · El correo no se envió: ${err.message}`; }
+      }
+      closeModal(); toast("Pago registrado" + mailTxt); await AdminData.load(); render();
+    } catch (err) { msg(friendly(err)); btn.disabled = false; }
+  };
+}
+async function sendThanksEmail(o) {
+  const sale = { ...o, sale_items: (o.order_items || []).map(i => ({ ...i, descuento: 0 })), forma_pago: "contado", estado: "completada", impuestos: 0,
+    notas: [o.envio != null ? `Envío: ${money(o.envio)} (incluido en el total)` : "Envío coordinado por WhatsApp", o.pago_nota ? "Pago: " + o.pago_nota : ""].filter(Boolean).join(" · ") };
+  const b64 = (await Invoice.build(sale)).output("datauristring").split(",")[1];
+  const { data, error } = await sb.functions.invoke("enviar-correo-pedido", { body: { order_id: o.id, pdf_base64: b64 } });
+  if (error) {
+    let code = error.message, status = error.context?.status;
+    try { const j = await error.context.json(); code = j.error || code; } catch {}
+    if (status === 404 || /not found|Failed to send a request/i.test(code)) throw new Error("La función de correo aún no está publicada en Supabase.");
+    if (code === "EMAIL_NO_CONFIGURADO") throw new Error("Falta configurar el correo (secretos GMAIL_USER y GMAIL_APP_PASSWORD en Supabase).");
+    if (code === "CLIENTE_SIN_CORREO") throw new Error("El cliente no dejó correo.");
+    throw new Error("No se pudo enviar el correo: " + code);
+  }
+  return data?.to || o.cliente?.email;
+}
+
+/* =========================================================================
    DOCUMENTO DE VENTA (PDF) — "Documento interno / pre-factura"
    No es una factura electrónica: no lleva CUFE/QR salvo que una integración
    real con un proveedor autorizado los registre en la venta (campos fe_*).
@@ -4719,7 +4792,7 @@ const Invoice = {
     let ry = 40; set(8, "bold", [110, 110, 110]); txt("DOCUMENTO N.º", W - M, ry, { align: "right" }); ry += 6;
     set(15, "bold"); txt(s.numero, W - M, ry, { align: "right" }); ry += 6;
     set(8.5, "normal", [70, 70, 70]);
-    [["Fecha y hora", fmtDate(s.created_at)], ["Forma de pago", s.forma_pago === "credito" ? "Crédito" : "Contado"], ["Medio de pago", POS_METHODS[s.metodo_pago] || s.metodo_pago]]
+    [["Fecha y hora", fmtDate(s.created_at)], ["Forma de pago", s.forma_pago === "credito" ? "Crédito" : "Contado"], ["Medio de pago", POS_METHODS[s.metodo_pago] || PaymentGateway.label(s.metodo_pago)]]
       .forEach(([k, v]) => { txt(`${k}: ${v}`, W - M, ry, { align: "right" }); ry += 4.4; });
     y = Math.max(y, ry) + 4;
     // Cliente
