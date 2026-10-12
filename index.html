@@ -1718,7 +1718,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, 
   auth: { flowType: "pkce", persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 /* URL pública de la tienda (sirve igual en GitHub Pages, dominio propio o local) */
-const SITE_URL = location.origin + location.pathname;
+const SITE_URL = location.origin + location.pathname.replace(/index\.html$/, "").replace(/\/?$/, "/");
 
 /* =========================================================================
    2. CONFIGURACIÓN POR DEFECTO (respaldo)
@@ -2897,6 +2897,7 @@ function viewLogin(next) {
       <div class="field"><label for="l_email">Correo electrónico</label><input id="l_email" name="email" type="email" autocomplete="email" inputmode="email" required></div>
       ${pwField("l_pw", "password", "Contraseña", "current-password")}
       <p class="form-msg" id="loginMsg" role="alert"></p>
+      <button type="button" class="link-btn" id="loginResend" hidden>Reenviar el correo de confirmación</button>
       <button class="btn btn--block" type="submit">Iniciar sesión</button>
       <p class="auth-forgot">¿Olvidaste tu contraseña? <a href="#/cuenta/recuperar" class="link-btn">Recuperar contraseña</a></p>
     </form>
@@ -2979,6 +2980,9 @@ function addressForm(a) {
 
 async function viewAccount(r) {
   const sub = r.param || "";
+  if (sub === "nueva-clave") return Store.user && Recovery.active() ? viewNewPassword() : viewBadLink({ motivo: "invalido", tipo: "recovery" });
+  if (sub === "confirmada") return viewConfirmed(r.query);
+  if (sub === "enlace-invalido") return viewBadLink(r.query);
   if (!Store.user) {
     if (sub === "registro") return viewRegister(r.query.next);
     if (sub === "recuperar") return viewRecover();
@@ -3076,17 +3080,42 @@ function mountAccount() {
     busy(e.target, true);
     const { error } = await sb.auth.signInWithPassword({ email: f.email.trim(), password: f.password });
     busy(e.target, false);
-    if (error) return msg("loginMsg", friendly(error));
+    if (error) {
+      msg("loginMsg", friendly(error));
+      const rb = $("#loginResend");
+      if (rb) { rb.hidden = !/Email not confirmed/i.test(error.message); rb.onclick = () => resendSignup(f.email.trim(), rb, "loginMsg"); }
+      return;
+    }
     const next = e.target.dataset.next; toast("Sesión iniciada");
     if (next) { if (next === "checkout") checkout.step = 2; location.hash = "#/" + next; }
   });
+  $("#newPwForm") && ($("#newPwForm").onsubmit = async e => {
+    e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
+    if (f.nueva.length < 8) return msg("newPwMsg", "La contraseña debe tener al menos 8 caracteres.");
+    if (f.nueva !== f.nueva2) return msg("newPwMsg", "Las contraseñas no coinciden.");
+    if (!Recovery.active()) return msg("newPwMsg", "El enlace venció. Pide uno nuevo desde «Recuperar contraseña».");
+    busy(e.target, true); $("#newPwForm button[type=submit]").textContent = "Guardando…";
+    const { error } = await sb.auth.updateUser({ password: f.nueva });
+    busy(e.target, false); $("#newPwForm button[type=submit]").textContent = "Guardar contraseña";
+    if (error) return msg("newPwMsg", friendly(error));
+    Recovery.end(); toast("Contraseña actualizada"); location.hash = "#/cuenta";
+  });
+  const badLink = act => async () => {
+    const email = $("#bl_email").value.trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)) return msg("badLinkMsg", "Escribe un correo válido.");
+    if (act === "signup") return resendSignup(email, null, "badLinkMsg");
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL });
+    msg("badLinkMsg", error && !/rate|seconds/i.test(error.message) ? friendly(error) : error ? "Ya enviamos un correo hace poco. Espera un minuto e inténtalo de nuevo." : "Si el correo está registrado, te enviamos un enlace nuevo. Revisa también Spam y Promociones.", !error);
+  };
+  $("#badLinkForm") && ($("#badLinkForm").onsubmit = e => { e.preventDefault(); badLink(e.submitter?.dataset.act || $("#badLinkForm [type=submit]").dataset.act)(); });
+  $("#badLinkAlt") && ($("#badLinkAlt").onclick = e => badLink(e.currentTarget.dataset.act)());
   $("#recoverForm") && ($("#recoverForm").onsubmit = async e => {
     e.preventDefault(); const email = $("#rc_email").value.trim();
     if (!/^\S+@\S+\.\S+$/.test(email)) return msg("recoverMsg", "Escribe un correo válido.");
     busy(e.target, true);
     const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL });
     busy(e.target, false);
-    msg("recoverMsg", error ? friendly(error) : "Si el correo está registrado, te enviamos un enlace para restablecer la contraseña. Revisa también tu carpeta de spam.", !error);
+    msg("recoverMsg", error && !/rate|seconds/i.test(error.message) ? friendly(error) : error ? "Ya enviamos un correo hace poco. Espera un minuto e inténtalo de nuevo." : "Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva. Revisa también Spam y Promociones.", !error);
   });
   $("#regForm") && ($("#regForm").onsubmit = async e => {
     e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
@@ -3100,8 +3129,12 @@ function mountAccount() {
     if (error) return msg("regMsg", friendly(error));
     if (!data.session) {
       $("#regCard").innerHTML = `<span class="auth-mark">${brandMark()}</span><div class="auth-done">${uiIcon("seguridad", 34)}<h1 class="auth-title">Revisa tu correo</h1>
-        <p class="auth-sub">Te enviamos un enlace a <b>${esc(f.email.trim())}</b> para confirmar tu cuenta. Después podrás iniciar sesión.</p>
+        <p class="auth-sub">Te enviamos un correo de <b>La Percha</b> a <b>${esc(f.email.trim())}</b>. Abre el enlace para confirmar tu cuenta; puedes abrirlo desde el celular o el computador.</p>
+        <p class="muted-text" style="font-size:13px;margin:0">¿No lo ves? Revisa las carpetas <b>Spam</b> y <b>Promociones</b>.</p>
+        <p class="form-msg" id="regResendMsg" role="status"></p>
+        <button type="button" class="btn btn--ghost btn--block" id="regResend">Reenviar correo</button>
         <a href="#/cuenta" class="btn btn--block">Ir a iniciar sesión</a></div>`;
+      $("#regResend").onclick = e2 => resendSignup(f.email.trim(), e2.currentTarget, "regResendMsg");
     } else { toast("Cuenta creada"); const next = e.target.dataset.next; location.hash = next ? "#/" + next : "#/cuenta"; }
   });
   $("#profForm") && ($("#profForm").onsubmit = async e => {
@@ -3154,19 +3187,79 @@ function mountAccount() {
     catch (err) { msg("addrMsg", friendly(err)); }
   });
 }
-function showRecoveryModal() {
-  openModal("Nueva contraseña", `<form id="recForm" class="stack" novalidate>
-    <div class="field"><label for="rec_pw">Nueva contraseña</label><input id="rec_pw" type="password" autocomplete="new-password" minlength="8" required></div>
-    <div class="field"><label for="rec_pw2">Confirmar contraseña</label><input id="rec_pw2" type="password" autocomplete="new-password" required></div>
-    <p class="form-msg" id="recMsg" role="alert"></p><button class="btn" type="submit">Guardar contraseña</button></form>`);
-  $("#recForm").onsubmit = async e => {
-    e.preventDefault(); const pw = $("#rec_pw").value;
-    if (pw.length < 8) { $("#recMsg").textContent = "Mínimo 8 caracteres."; return; }
-    if (pw !== $("#rec_pw2").value) { $("#recMsg").textContent = "Las contraseñas no coinciden."; return; }
-    const { error } = await sb.auth.updateUser({ password: pw });
-    if (error) { $("#recMsg").textContent = friendly(error); return; }
-    closeModal(); toast("Contraseña actualizada. Ya puedes usar tu cuenta.");
-  };
+/* =========================================================================
+   ENLACES DE CORREO (confirmación, recuperación, cambio de correo)
+   Las plantillas de Supabase envían: <sitio>/?token_hash=…&type=signup|recovery|email_change
+   El enlace se valida con verifyOtp, así funciona aunque se abra en otro dispositivo o navegador.
+   ========================================================================= */
+const Recovery = {
+  key: "lp_recovery_until",
+  start() { try { sessionStorage.setItem(this.key, String(Date.now() + 30 * 60 * 1000)); } catch {} },
+  active() { try { return Number(sessionStorage.getItem(this.key) || 0) > Date.now(); } catch { return false; } },
+  end() { try { sessionStorage.removeItem(this.key); } catch {} }
+};
+function cleanUrl(hash) { history.replaceState(null, "", location.pathname + hash); }
+async function processAuthLink() {
+  const q = new URLSearchParams(location.search);
+  const h = /^#\/?(error|error_code|access_token)=/.test(location.hash) ? new URLSearchParams(location.hash.replace(/^#\/?/, "")) : null;
+  const err = q.get("error_code") || q.get("error") || h?.get("error_code") || h?.get("error");
+  if (err) { cleanUrl(`#/cuenta/enlace-invalido?motivo=${/expired/.test(err) ? "caducado" : "invalido"}`); return; }
+  const tokenHash = q.get("token_hash"), type = q.get("type");
+  if (tokenHash && type) {
+    if (type === "recovery") await sb.auth.signOut({ scope: "local" }).catch(() => {});
+    const { error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type });
+    if (error) { cleanUrl(`#/cuenta/enlace-invalido?motivo=${/expired|invalid/i.test(error.message) ? "caducado" : "invalido"}&tipo=${encodeURIComponent(type)}`); return; }
+    if (type === "recovery") { Recovery.start(); cleanUrl("#/cuenta/nueva-clave"); }
+    else cleanUrl(`#/cuenta/confirmada${type === "email_change" ? "?tipo=correo" : ""}`);
+    return;
+  }
+  if (q.has("code")) {   // enlaces antiguos (PKCE): supabase-js los procesa al iniciar
+    const { data } = await sb.auth.getSession();
+    cleanUrl(data.session ? (location.hash && location.hash !== "#/" ? location.hash : "#/cuenta/confirmada") : "#/cuenta/enlace-invalido?motivo=invalido");
+  }
+}
+let resendUntil = 0;
+async function resendSignup(email, btn, msgId) {
+  const out = (t, ok) => { const el = $("#" + msgId); if (el) { el.textContent = t; el.classList.toggle("ok", !!ok); } };
+  if (!/^\S+@\S+\.\S+$/.test(email || "")) return out("Escribe un correo válido.");
+  if (Date.now() < resendUntil) return out(`Espera ${Math.ceil((resendUntil - Date.now()) / 1000)} segundos para volver a enviarlo.`);
+  if (btn) btn.disabled = true;
+  const { error } = await sb.auth.resend({ type: "signup", email, options: { emailRedirectTo: SITE_URL } });
+  if (btn) btn.disabled = false;
+  resendUntil = Date.now() + 60000;
+  out(error && !/rate|seconds/i.test(error.message) ? friendly(error) : error ? "Ya enviamos un correo hace poco. Espera un minuto e inténtalo de nuevo." : "Listo. Si la cuenta está pendiente de confirmar, te llegará un correo nuevo en unos minutos.", !error);
+}
+function authCard(inner) { return `<section class="page wrap auth-page"><div class="auth-card"><span class="auth-mark">${brandMark()}</span>${inner}</div></section>`; }
+function viewNewPassword() {
+  return authCard(`<h1 class="auth-title">Nueva contraseña</h1>
+    <p class="auth-sub">Crea una contraseña nueva para <b>${esc(Store.user.email)}</b>.</p>
+    <form id="newPwForm" class="stack" novalidate>
+      ${pwField("np_pw", "nueva", "Nueva contraseña", "new-password", 'minlength="8"')}
+      ${pwField("np_pw2", "nueva2", "Confirmar contraseña", "new-password")}
+      <span class="hint">Mínimo 8 caracteres.</span>
+      <p class="form-msg" id="newPwMsg" role="alert"></p>
+      <button class="btn btn--block" type="submit">Guardar contraseña</button>
+    </form>`);
+}
+function viewConfirmed(q) {
+  const correo = q.tipo === "correo";
+  return authCard(`<div class="auth-done"><div class="check-circle">${ICON.check}</div>
+    <h1 class="auth-title">${correo ? "Correo actualizado" : "¡Cuenta confirmada!"}</h1>
+    <p class="auth-sub">${correo ? "Tu nuevo correo quedó verificado." : `Bienvenido a ${esc(S().tienda.nombre)}. Tu correo quedó verificado y tu cuenta está lista.`}</p>
+    ${Store.user ? `<a href="#/cuenta" class="btn btn--block">Ir a mi cuenta</a>` : `<a href="#/cuenta" class="btn btn--block">Iniciar sesión</a>`}
+    <a href="#/tienda" class="btn btn--ghost btn--block">Ver la tienda</a></div>`);
+}
+function viewBadLink(q) {
+  const caducado = q.motivo === "caducado", rec = q.tipo === "recovery";
+  return authCard(`<h1 class="auth-title">${caducado ? "El enlace caducó" : "Enlace no válido"}</h1>
+    <p class="auth-sub">${caducado ? "Por seguridad, los enlaces de los correos vencen después de un tiempo y solo se pueden usar una vez." : "Este enlace ya se usó, está incompleto o no es válido."} Escribe tu correo y te enviamos uno nuevo.</p>
+    <form id="badLinkForm" class="stack" novalidate>
+      <div class="field"><label for="bl_email">Correo electrónico</label><input id="bl_email" type="email" autocomplete="email" inputmode="email" required value="${esc(Store.user?.email || "")}"></div>
+      <p class="form-msg" id="badLinkMsg" role="status"></p>
+      <button class="btn btn--block" type="submit" data-act="${rec ? "recovery" : "signup"}">${rec ? "Enviar enlace para cambiar la contraseña" : "Reenviar correo de confirmación"}</button>
+      <button class="btn btn--ghost btn--block" type="button" id="badLinkAlt" data-act="${rec ? "signup" : "recovery"}">${rec ? "Reenviar confirmación de cuenta" : "Olvidé mi contraseña"}</button>
+    </form>
+    <div class="auth-alt"><a href="#/cuenta" class="link-btn">← Volver a iniciar sesión</a></div>`);
 }
 
 function viewNotFound(text) {
@@ -4028,7 +4121,7 @@ const Admin = {
     const sec = (t, ok) => { $("#secMsg").textContent = t; $("#secMsg").classList.toggle("ok", !!ok); };
     $("#admEmail").onclick = async () => {
       const email = $("#ap_email").value.trim(); if (!/^\S+@\S+\.\S+$/.test(email)) return sec("Correo no válido.");
-      const { error } = await sb.auth.updateUser({ email }, { emailRedirectTo: SITE_URL + "#/admin" });
+      const { error } = await sb.auth.updateUser({ email }, { emailRedirectTo: SITE_URL });
       sec(error ? friendly(error) : "Te enviamos un enlace de confirmación. El cambio se aplica cuando lo confirmes (según la configuración de Supabase, puede pedirse en ambos correos).", !error);
     };
     $("#admPw").onclick = async () => {
@@ -4605,7 +4698,7 @@ const Invoice = {
       let code = error.message, status = error.context?.status;
       try { const j = await error.context.json(); code = j.error || code; } catch {}
       if (status === 404 || /not found|Failed to send a request/i.test(code)) throw new Error("La función de correo aún no está desplegada en Supabase (ver supabase/INSTRUCCIONES.md). Puedes descargar el PDF y enviarlo manualmente.");
-      if (code === "EMAIL_NO_CONFIGURADO") throw new Error("Falta configurar el proveedor de correo (secretos RESEND_API_KEY y EMAIL_FROM en Supabase).");
+      if (code === "EMAIL_NO_CONFIGURADO") throw new Error("Falta configurar el correo (secretos GMAIL_USER y GMAIL_APP_PASSWORD en Supabase → Edge Functions → Secrets).");
       if (code === "CLIENTE_SIN_CORREO") throw new Error("El cliente no tiene correo registrado.");
       throw new Error("No se pudo enviar el correo: " + code);
     }
@@ -4778,7 +4871,7 @@ async function render() {
     case "categorias": html = viewCategories(); break;
     case "producto": html = viewProduct(r.param); mount = mountProduct; break;
     case "favoritos": html = viewFavs(); break;
-    case "cuenta": if (changed && Store.user && !["registro", "recuperar"].includes(r.param)) app.innerHTML = loaderHTML(); if (changed) addrEditing = null; html = await viewAccount(r); mount = mountAccount; break;
+    case "cuenta": if (changed && Store.user && !["registro", "recuperar", "nueva-clave", "confirmada", "enlace-invalido"].includes(r.param)) app.innerHTML = loaderHTML(); if (changed) addrEditing = null; html = await viewAccount(r); mount = mountAccount; break;
     case "checkout": html = viewCheckout(); mount = renderCheckoutStep; break;
     case "pedido": html = await viewOrderDone(r.param); break;
     default: if (LIST_ROUTES.includes(r.name)) { html = viewList(r); mount = () => mountList(r); } else html = viewNotFound();
@@ -4956,12 +5049,12 @@ async function onSession(session, event) {
   if (!Store.user) { AdminData.loaded = false; if (Store.productsAreAdmin) await Api.loadCatalog().catch(() => {}); }
   updateCounts();
   subscribeRealtime();
-  if (event === "PASSWORD_RECOVERY") showRecoveryModal();
+  if (event === "PASSWORD_RECOVERY") { Recovery.start(); location.hash = "#/cuenta/nueva-clave"; }
 }
 
 (async function init() {
   applyBranding(); updateCounts(); render();
-  addEventListener("hashchange", () => { closeAll(); render(); });
+  addEventListener("hashchange", async () => { closeAll(); if (/^#\/?(error|error_code|access_token)=/.test(location.hash)) await processAuthLink().catch(() => {}); render(); });
   try {
     await Promise.all([Api.loadSettings(), Api.loadCatalog()]);
   } catch (e) { Store.error = e; console.error(e); }
@@ -4977,10 +5070,9 @@ async function onSession(session, event) {
     } catch (e) { console.error(e); }
   }
   Store.ready = true;
+  await processAuthLink().catch(e => { console.error(e); cleanUrl("#/cuenta/enlace-invalido?motivo=invalido"); });
   const { data } = await sb.auth.getSession();
   await onSession(data.session);
-  // Limpia ?code= de la URL tras confirmar correo / recuperar contraseña (PKCE)
-  if (/[?&]code=/.test(location.search)) history.replaceState(null, "", location.pathname + (location.hash || "#/cuenta"));
   sb.auth.onAuthStateChange((event, session) => {
     if (event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") return;
     setTimeout(async () => { await onSession(session, event); if (event === "SIGNED_OUT") { AdminData.loaded = false; } render(); }, 0);
