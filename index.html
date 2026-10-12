@@ -1521,7 +1521,10 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
 .visit2__in{position:relative;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(28px,5vw,80px);align-items:center}
 .visit2__logo{height:64px;width:auto;margin-bottom:22px}
 .visit2 .eyebrow{color:#c9a24e}
-.visit2__title{font-size:clamp(38px,4.6vw,72px);color:#fff;margin:14px 0 26px}
+.visit2__title{font-size:clamp(38px,4.6vw,72px);color:#fff;margin:14px 0 14px}
+.visit2__gem{display:inline-block;font-size:.72em;vertical-align:.08em;animation:gem 3.2s ease-in-out infinite}
+@keyframes gem{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-6deg)}}
+.visit2__lead{margin:0 0 26px;font-size:16.5px;line-height:1.55;color:rgba(243,238,228,.78);max-width:38ch}
 .visit2__info{list-style:none;margin:0 0 30px;padding:0;display:grid;gap:16px}
 .visit2__info li{display:grid;grid-template-columns:20px 1fr;gap:14px;align-items:start;font-size:14.5px;color:rgba(243,238,228,.78)}
 .visit2__info svg{color:#c9a24e;margin-top:2px}
@@ -1532,6 +1535,27 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
 .visit2 .btn--light:hover{color:#111}
 .visit2 .btn--light::before{background:#c9a24e}
 @media (max-width:860px){.visit2__in{grid-template-columns:1fr}.visit2__map .minimap{transform:none;aspect-ratio:4/3}}
+
+/* Página privada del pedido */
+.olink__head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:28px}
+.olink__num{font-size:clamp(40px,6vw,76px);margin-top:6px}
+.olink__total{display:grid;justify-items:end;gap:8px}
+.olink__total span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.olink__total b{font:700 clamp(26px,3vw,36px)/1 var(--f-head)}
+.olink__items{display:grid;gap:18px}
+.olink__item{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(16px,3vw,40px);align-items:center;background:var(--paper-2);padding:clamp(12px,2vw,20px)}
+.olink__img{aspect-ratio:4/5;background:var(--tile);overflow:hidden}
+.olink__img img{width:100%;height:100%;object-fit:cover}
+.olink__info h2{margin:0 0 16px;font:600 clamp(20px,2.4vw,30px)/1.1 var(--f-head);text-transform:uppercase}
+.olink__info dl{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.olink__info dt{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.olink__info dd{margin:4px 0 0;font:600 18px/1.2 var(--f-display)}
+.olink__grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.olink__box{border:1px solid var(--line);padding:20px}
+.olink__box h3{margin:0 0 12px;font:700 12px/1 var(--f-display);letter-spacing:.18em;text-transform:uppercase}
+.olink__box p{margin:3px 0;font-size:14.5px}
+.olink__actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+@media (max-width:720px){.olink__item{grid-template-columns:1fr}.olink__grid{grid-template-columns:1fr}.olink__total{justify-items:start}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -2055,12 +2079,15 @@ function waLink(text, number) {
   const n = number != null ? phoneIntl(number) : storeWhatsApp();
   return `https://wa.me/${n}?text=${encodeURIComponent(text || S().whatsapp.mensajeGeneral)}`;
 }
+/* Enlace privado del pedido (página con fotos, solo lectura). Requiere supabase/06_enlace_pedido.sql */
+const orderLinkUrl = token => `${SITE_URL}#/p/${token}`;
 function orderWhatsAppText(o) {
   const c = o.cliente || {};
   const L = [];
   L.push(`*PEDIDO ${S().tienda.nombre.toUpperCase()}*`);
   L.push(`Número de pedido: ${o.numero}`);
   L.push(`Fecha: ${fmtDate(o.created_at)}`);
+  if (o.link_token) { L.push(""); L.push("📸 *Ver el pedido con fotos:*"); L.push(orderLinkUrl(o.link_token)); }
   L.push("");
   L.push("*Cliente*");
   L.push(`Nombre: ${c.nombre}`);
@@ -2296,7 +2323,7 @@ function viewHome() {
   const spot = [["camisetas", "Camisetas"], ["conjuntos", "Conjuntos"], ["jeans", "Jeans"], ["buzos", "Buzos"], ["tenis", "Tenis"], ["chanclas", "Chanclas"], ["morrales", "Morrales"], ["billeteras", "Billeteras"]]
     .map(([slug, label]) => ({ slug, label, n: catCount(slug), cover: catCover(slug) })).filter(c => c.n);
   const highlight = all.filter(p => Catalog.groupOf(p) === "calzado").slice(0, 8);
-  const insta = ["img/catalogo/camisetas/lp-0004.jpg", "img/catalogo/tenis/lp-0382.jpg", "img/catalogo/camisetas/lp-0024.jpg", "img/catalogo/conjuntos/lp-0173.jpg", "img/catalogo/camisetas/lp-0021.jpg", "img/catalogo/tenis/lp-0347.jpg"];
+  const insta = ["img/catalogo/camisetas/lp-0004.jpg", "img/catalogo/tenis/lp-0329-portada.jpg", "img/catalogo/camisetas/lp-0024.jpg", "img/catalogo/conjuntos/lp-0173.jpg", "img/catalogo/camisetas/lp-0021.jpg", "img/catalogo/tenis/lp-0347.jpg"];
   const arrows = id => `<div class="rail-nav"><button type="button" class="rail-btn" data-rail="${id}" data-dir="-1" aria-label="Anterior">${ICON.left}</button><button type="button" class="rail-btn" data-rail="${id}" data-dir="1" aria-label="Siguiente">${ICON.right}</button></div>`;
   return `
   <section class="hero hero--slides on-dark" id="hero" aria-label="Portada" aria-roledescription="carrusel">
@@ -2343,8 +2370,9 @@ function viewHome() {
   <section class="visit2 on-dark" aria-labelledby="storeTitle"><div class="wrap visit2__in">
     <div class="visit2__txt rv">
       <img class="visit2__logo" src="assets/logo-header.png" alt="" width="420" height="291" loading="lazy">
-      <p class="eyebrow">Tienda física · Valledupar</p>
-      <h2 class="h-display visit2__title" id="storeTitle">Tú estilo,<br>a otro nivel.</h2>
+      <p class="eyebrow">La Percha · Valledupar</p>
+      <h2 class="h-display visit2__title" id="storeTitle">Tu estilo,<br>a otro nivel. <span class="visit2__gem" aria-hidden="true">💎</span></h2>
+      <p class="visit2__lead">Prendas y accesorios para caballeros que visten con personalidad.</p>
       <ul class="visit2__info">
         <li><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg><span><b>Dirección</b>${esc(t.direccion)}</span></li>
         <li>${ICON.wa}<span><b>WhatsApp</b>${esc(String(storeWhatsApp()).replace(/^57(\d{3})(\d{3})(\d{4})$/, "$1 $2 $3"))}</span></li>
@@ -2788,6 +2816,7 @@ async function placeOrder() {
   try {
     const items = CartService.detail().map(l => ({ variant_id: l.vid, cantidad: l.qty }));
     const order = await Api.createOrder(items, checkout.data, checkout.pago);
+    try { order.link_token = await rpc("order_link", { p_order_id: order.id }); } catch {}   // si falta la migración 06, el pedido sigue sin enlace
     await PaymentGateway.iniciar(order);
     try { sessionStorage.setItem("lpc_order_" + order.numero, JSON.stringify(order)); } catch {}
     CartService.clear(); checkout.step = 1; checkout.data = null;
@@ -2800,6 +2829,57 @@ async function placeOrder() {
     btn.disabled = false; btn.textContent = "Confirmar pedido";
   } finally { checkout.busy = false; }
 }
+
+/* ---------- Página privada del pedido (enlace de WhatsApp) ---------- */
+async function viewOrderLink(token) {
+  let o = null;
+  try { o = await rpc("order_by_link", { p_token: token }); } catch (e) { o = { error: /order_by_link|function|schema/i.test(e.message) ? "sin_migracion" : "red" }; }
+  if (!o || o.error) {
+    const t = { vencido: ["Este enlace venció", "Por seguridad, los enlaces de los pedidos funcionan durante 30 días."],
+                sin_migracion: ["Enlace no disponible", "La tienda aún no activa los enlaces de pedido."],
+                red: ["No pudimos cargar el pedido", "Revisa tu conexión e inténtalo de nuevo."] }[o?.error] || ["Enlace no válido", "Revisa que el enlace esté completo."];
+    return `<section class="page wrap"><div class="done"><h1 class="h-display" style="font-size:clamp(32px,5vw,56px)">${t[0]}</h1><p>${t[1]}</p>
+      <div class="btns"><a class="btn" href="${esc(waLink())}" target="_blank" rel="noopener">${ICON.wa} Escribir a ${esc(S().tienda.nombre)}</a></div></div></section>`;
+  }
+  const c = o.cliente || {}, items = o.items || [];
+  const units = items.reduce((a, i) => a + i.cantidad, 0);
+  const tel = digits(c.telefono);
+  return `<section class="page wrap olink">
+    <header class="olink__head">
+      <div><p class="eyebrow">Pedido · ${esc(fmtDate(o.created_at))}</p><h1 class="h-display olink__num">${esc(o.numero)}</h1>
+        <p class="muted-text" style="margin:8px 0 0">${units} ${units === 1 ? "producto" : "productos"} · ${esc(PaymentGateway.label(o.metodo_pago))}</p></div>
+      <div class="olink__total"><span>Total</span><b>${money(o.total)}</b>${statusPill(o.estado)}</div>
+    </header>
+    <div class="olink__items">${items.map(i => `<article class="olink__item">
+      <div class="olink__img">${i.imagen ? img(i.imagen, i.nombre, "", 'loading="eager"') : ""}</div>
+      <div class="olink__info"><h2>${esc(i.nombre)}</h2>
+        <dl><div><dt>Talla</dt><dd>${esc(i.talla)}</dd></div>${i.color ? `<div><dt>Color</dt><dd>${esc(i.color)}</dd></div>` : ""}
+          <div><dt>Cantidad</dt><dd>${i.cantidad}</dd></div><div><dt>Precio</dt><dd>${i.precio_unitario == null ? "A confirmar" : money(i.precio_unitario)}</dd></div></dl>
+        ${i.ref ? `<p class="ref">Ref. ${esc(i.ref)}</p>` : ""}</div></article>`).join("")}</div>
+    <div class="olink__grid">
+      <section class="olink__box"><h3>Cliente y entrega</h3>
+        <p><b>${esc(c.nombre)}</b></p><p>${esc(c.telefono)}${c.email ? " · " + esc(c.email) : ""}</p>
+        <p>${esc(c.direccion)}${c.barrio ? ", barrio " + esc(c.barrio) : ""}</p><p>${esc(c.ciudad)}</p>
+        ${c.info_adicional ? `<p class="muted-text">${esc(c.info_adicional)}</p>` : ""}</section>
+      <section class="olink__box"><h3>Resumen</h3>
+        <div class="sum"><span>Subtotal</span><span>${money(o.subtotal)}</span></div>
+        ${Number(o.descuento) > 0 ? `<div class="sum"><span>Descuento</span><span>-${money(o.descuento)}</span></div>` : ""}
+        <div class="sum"><span>Envío</span><span>${o.envio == null ? "A coordinar" : money(o.envio)}</span></div>
+        <div class="sum sum--total"><span>Total</span><span>${money(o.total)}</span></div>
+        ${o.items_sin_precio ? `<p class="cart-note">${o.items_sin_precio} producto(s) con precio a confirmar.</p>` : ""}</section>
+    </div>
+    <div class="olink__actions">
+      ${tel ? `<a class="btn btn--wa" href="${esc(waLink(`Hola ${String(c.nombre || "").split(" ")[0]}, te escribimos de ${S().tienda.nombre} sobre tu pedido ${o.numero}.`, c.telefono))}" target="_blank" rel="noopener">${ICON.wa} Escribir al cliente</a>` : ""}
+      <a class="btn btn--ghost" href="#/admin/pedidos/${encodeURIComponent(o.numero)}">Abrir en el panel</a>
+      <button type="button" class="btn btn--ghost" data-copy="${esc(location.href)}">Copiar enlace</button>
+    </div>
+    <p class="muted-text" style="font-size:12px;margin-top:18px">Página privada del pedido, solo para consulta${o.link_expires_at ? ` · disponible hasta el ${esc(new Date(o.link_expires_at).toLocaleDateString("es-CO", { day: "numeric", month: "long" }))}` : ""}. No la compartas con otras personas.</p>
+  </section><div class="section"></div>`;
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-copy]"); if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.copy); toast("Enlace copiado"); } catch { prompt("Copia el enlace:", b.dataset.copy); }
+});
 
 /* ---------- Página de confirmación ---------- */
 async function viewOrderDone(numero) {
@@ -3617,7 +3697,8 @@ const Admin = {
           <p class="muted-text" style="font-size:12px;margin:10px 0 0">Unidades descontadas del inventario: ${reserved}</p></div>
         <div class="card-w"><h2>Contacto</h2>
           <a class="wa-ask" style="margin:0" target="_blank" rel="noopener" href="${esc(waLink(custMsg, o.cliente.telefono))}">${ICON.wa} Escribir al cliente</a>
-          <a class="wa-ask" target="_blank" rel="noopener" href="${esc(waLink(orderWhatsAppText(o), o.cliente.telefono))}">Enviar resumen al cliente</a></div>
+          <a class="wa-ask" target="_blank" rel="noopener" href="${esc(waLink(orderWhatsAppText(o), o.cliente.telefono))}">Enviar resumen al cliente</a>
+          ${o.link_token ? `<a class="wa-ask" href="${esc(orderLinkUrl(o.link_token))}" target="_blank" rel="noopener">Ver página del pedido con fotos ↗</a><button type="button" class="wa-ask" data-copy="${esc(orderLinkUrl(o.link_token))}">Copiar enlace del pedido</button>` : ""}</div>
         <div class="card-w"><h2>Nota interna</h2><textarea id="orderNote" class="textarea" aria-label="Nota interna">${esc(o.nota_admin || "")}</textarea><button class="btn btn--ghost" id="saveNote" style="margin-top:8px">Guardar nota</button></div>
         <div class="card-w"><h2>Eliminar pedido</h2><p class="muted-text" style="font-size:13px;margin:0 0 10px">Para pedidos de prueba o duplicados. Es permanente.</p><button class="btn btn--ghost btn--danger-ghost" id="delOrder">Eliminar pedido</button></div>
       </div></div>`);
@@ -4874,6 +4955,7 @@ async function render() {
     case "cuenta": if (changed && Store.user && !["registro", "recuperar", "nueva-clave", "confirmada", "enlace-invalido"].includes(r.param)) app.innerHTML = loaderHTML(); if (changed) addrEditing = null; html = await viewAccount(r); mount = mountAccount; break;
     case "checkout": html = viewCheckout(); mount = renderCheckoutStep; break;
     case "pedido": html = await viewOrderDone(r.param); break;
+    case "p": html = await viewOrderLink(r.param); break;
     default: if (LIST_ROUTES.includes(r.name)) { html = viewList(r); mount = () => mountList(r); } else html = viewNotFound();
   }
   if (seq !== renderSeq) return;
@@ -4882,7 +4964,7 @@ async function render() {
   if (changed) { app.classList.remove("view-enter"); void app.offsetWidth; app.classList.add("view-enter"); }
   mount && mount();
   if (isAdm) bindAdminShell();
-  const titles = { home: "Tienda de ropa exclusiva en Valledupar", politicas: "Políticas", tienda: "Tienda", ropa: "Ropa", calzado: "Calzado", accesorios: "Accesorios", mujer: "Mujer", sale: "Sale", categorias: "Categorías", favoritos: "Favoritos", checkout: "Finalizar compra", cuenta: "Mi cuenta", admin: "Administración", pedido: "Pedido " + (r.param || "") };
+  const titles = { home: "Tienda de ropa exclusiva en Valledupar", politicas: "Políticas", tienda: "Tienda", ropa: "Ropa", calzado: "Calzado", accesorios: "Accesorios", mujer: "Mujer", sale: "Sale", categorias: "Categorías", favoritos: "Favoritos", checkout: "Finalizar compra", cuenta: "Mi cuenta", admin: "Administración", p: "Pedido", pedido: "Pedido " + (r.param || "") };
   const pt = r.name === "producto" ? Catalog.bySlug(r.param)?.nombre : r.name === "categoria" ? Catalog.category(r.param)?.nombre : titles[r.name];
   document.title = `${S().tienda.nombre} — ${pt || (Store.ready ? "Página no encontrada" : "Tienda online")}`;
   $$("[data-nav]").forEach(a => { const on = a.dataset.nav === r.name || (r.name === "categoria" && a.dataset.nav === Catalog.category(r.param)?.grupo); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
