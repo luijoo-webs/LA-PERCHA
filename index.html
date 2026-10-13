@@ -4923,6 +4923,7 @@ async function sendThanksEmail(o) {
     if (code === "CLIENTE_SIN_CORREO") throw new Error("El cliente no dejó correo.");
     throw new Error("No se pudo enviar el correo: " + code);
   }
+  if (data?.bono) setTimeout(() => toast(`Bono ${data.bono} ganado: se le envió un correo aparte al cliente`), 2600);
   return data?.to || o.cliente?.email;
 }
 
