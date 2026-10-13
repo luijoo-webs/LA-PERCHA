@@ -1629,6 +1629,37 @@ body.is-admin .club-promo{display:none}
 .club-inline--auth{margin:0 0 20px}
 @media (max-width:560px){.club-inline{flex-wrap:wrap}.club-inline .btn{width:100%}}
 @media (prefers-reduced-motion:reduce){.club-promo__card,.club-promo__pill{animation:none!important;transition:none!important}}
+
+/* ---------- Cupón de descuento (checkout) ---------- */
+.coupon-box{border:1px solid rgba(201,162,78,.5);background:linear-gradient(180deg,rgba(201,162,78,.08),transparent 70%);padding:16px 18px}
+.coupon-box h3{display:flex;align-items:center;gap:8px;margin-top:0}
+.coupon-box h3 svg{color:#a8832f;width:20px;height:20px}
+.coupon-form{display:flex;gap:8px}
+.coupon-form input{flex:1;min-width:0;height:46px;padding:0 14px;border:1px solid var(--line);background:var(--bg,#fff);color:inherit;font:600 15px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
+.coupon-form input:focus{outline:2px solid #c9a24e;outline-offset:-1px}
+.coupon-form input:disabled{opacity:.55}
+.coupon-form .btn{height:46px;flex:none}
+.coupon-box .form-msg{margin:8px 0 0;font-size:13px}
+.coupon-box .form-msg:empty{display:none}
+.coupon-sub{margin:14px 0 8px;font-size:12.5px;color:var(--muted,#666)}
+.coupon-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.coupon-chip{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;text-align:left;padding:12px 14px;border:1px dashed #c9a24e;background:var(--bg,#fff);color:inherit;cursor:pointer;transition:background .2s,transform .2s}
+.coupon-chip:hover{background:rgba(201,162,78,.12);transform:translateY(-1px)}
+.coupon-chip b{font-size:16px}
+.coupon-chip span{grid-column:1;font:600 12px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em}
+.coupon-chip small{grid-column:1;font-size:11.5px;color:var(--muted,#777)}
+.coupon-chip em{grid-row:1/4;grid-column:2;font-style:normal;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;background:#0f0f0f;color:#e2c477;padding:8px 10px}
+.coupon-applied{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#0f0f0f;color:#f3efe6;border-left:3px solid #c9a24e}
+.coupon-applied b{display:block;font:700 15px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:#e2c477}
+.coupon-applied small{font-size:12.5px;color:#cfc9bd}
+.coupon-applied .link-btn{color:#f3efe6;white-space:nowrap;flex:none}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em}
+.coupon-created{font-size:24px;font-weight:700;letter-spacing:.12em;text-align:center;padding:16px;border:2px dashed #c9a24e;margin:12px 0}
+.adm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 0 16px}
+.tools select{height:42px;padding:0 10px;border:1px solid var(--line);background:var(--bg,#fff);color:inherit}
+.promo-note{margin:6px 0 0;font-size:13px;padding:8px 12px;background:rgba(201,162,78,.12);border-left:3px solid #c9a24e}
+.policy-sign{margin:28px 0 0;font-size:12px;letter-spacing:.22em;font-weight:700;color:#a8832f}
+@media (max-width:480px){.coupon-form{flex-wrap:wrap}.coupon-form .btn{width:100%}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -1839,8 +1870,8 @@ const DEFAULT_SETTINGS = {
             widgetSlug: "", widgetScript: "https://s3.amazonaws.com/widgets.addi.com/bundle.min.js" }
   },
   pedidos: { prefijo: "LP-", digitos: 4, costoEnvio: null,
-             textoEnvio: "Enviamos a toda Colombia. El costo y el tiempo de entrega dependen de tu ciudad y se confirman contigo por WhatsApp al confirmar el pedido.",
-             politicaCambios: "Tienes 5 días hábiles desde que recibes tu pedido para solicitar un cambio de talla o referencia. La prenda debe estar sin uso, sin lavar y con sus etiquetas. Escríbenos por WhatsApp con tu número de pedido. Consulta la política completa en la sección Políticas." },
+             textoEnvio: "Enviamos a toda Colombia por la transportadora que elijas. El costo y el tiempo de entrega se confirman por WhatsApp. Nos hacemos responsables hasta la entrega de la guía de envío; desde ese momento el paquete queda bajo responsabilidad de la transportadora.",
+             politicaCambios: "No hacemos devoluciones de dinero por cambio de opinión, talla, color o gusto personal. Los cambios están sujetos a nuestras condiciones y a la disponibilidad de inventario: la prenda debe estar en perfecto estado, sin uso, sin lavar y con sus etiquetas originales. Las prendas en PROMO no tienen cambio." },
   inventario: { umbralStockBajo: 2 },
   /* Facturación: vacío hasta que el negocio lo configure en Admin → Facturación (no se inventan datos tributarios) */
   facturacion: { razonSocial: "", nombreComercial: "La Percha", nit: "", dv: "", direccion: "Cra. 19E2 #13B-46, frente a la cancha de Las Flores", ciudad: "Valledupar, Cesar", telefono: "314 454 3114", correo: "", logo: "",
@@ -1878,9 +1909,13 @@ const Store = { addresses: [], ready: false, error: null, settings: structuredCl
 
 const ERR = {
   EMAIL_REQUERIDO: "Escribe un correo electrónico válido: allí te enviamos la factura.",
-  CUPON_INVALIDO: "Ese bono ya no está disponible.",
-  CUPON_REQUIERE_CUENTA: "Inicia sesión para usar tu bono.",
-  CUPON_SIN_PRECIO: "El bono se aplica sobre productos con precio confirmado.",
+  CUPON_INVALIDO: "Ese cupón no existe o no está disponible para tu cuenta. Revisa el código.",
+  CUPON_USADO: "Ese cupón ya fue usado. Cada cupón sirve una sola vez.",
+  CUPON_VENCIDO: "Ese cupón ya venció (los cupones duran 3 meses).",
+  VALOR_INVALIDO: "Escribe un valor válido.",
+  CLIENTE_NO_EXISTE: "No hay ningún cliente registrado con ese correo.",
+  CUPON_REQUIERE_CUENTA: "Inicia sesión para usar tu cupón.",
+  CUPON_SIN_PRECIO: "El cupón se aplica sobre productos con precio confirmado.",
   NO_AUTORIZADO: "No tienes permisos para esta acción.",
   DATOS_INCOMPLETOS: "Completa todos los datos de envío.",
   TELEFONO_INVALIDO: "El número de teléfono no es válido.",
@@ -1910,7 +1945,7 @@ function friendly(e) {
   if (code === "STOCK_INSUFICIENTE") { const [what, left] = rest.split("|"); return `Stock insuficiente: ${what}. ${Number(left) > 0 ? "Disponibles: " + left + "." : "Está agotado."}`; }
   if (code === "PRODUCTO_NO_DISPONIBLE") return `${rest} ya no está disponible.`;
   if (code === "PRECIO_NO_DISPONIBLE") return `${rest} aún no tiene precio. Consúltalo por WhatsApp.`;
-  if (code === "CUPON_MINIMO") return `El bono aplica para compras desde ${money(rest)}.`;
+  if (code === "CUPON_MINIMO") return `El cupón aplica para compras desde ${money(rest)}.`;
   if (code === "PRECIO_REQUERIDO") return `Escribe el precio de venta de ${rest}.`;
   if (code === "DESCUENTO_INVALIDO") return rest === "venta" ? "El descuento general supera el valor de la venta." : `El descuento de ${rest} no es válido.`;
   if (code === "STOCK_NEGATIVO" && rest) { const [what, left] = rest.split("|"); return `No se puede dejar stock negativo: ${what} (hay ${left}).`; }
@@ -2185,7 +2220,7 @@ function orderWhatsAppText(o) {
   });
   L.push("");
   L.push(`Subtotal: ${money(o.subtotal)}${o.items_sin_precio ? ` (+ ${o.items_sin_precio} producto(s) con precio a confirmar)` : ""}`);
-  if (Number(o.descuento) > 0) L.push(`${o.cupon_codigo ? "Bono " + o.cupon_codigo : "Descuento"}: -${money(o.descuento)}`);
+  if (Number(o.descuento) > 0) L.push(`${o.cupon_codigo ? "Cupón " + o.cupon_codigo : "Descuento"}: -${money(o.descuento)}`);
   L.push(`Envío: ${o.envio == null ? "a coordinar" : money(o.envio)}`);
   L.push(`*Total: ${money(o.total)}*${o.items_sin_precio || o.envio == null ? " (sujeto a confirmación)" : ""}`);
   L.push(`Método de pago: ${PaymentGateway.label(o.metodo_pago)}`);
@@ -2497,17 +2532,25 @@ function viewPolicies() {
   const t = S().tienda, pd = S().pedidos;
   const sec = (id, title, body) => `<section class="policy" id="${id}"><h2>${title}</h2>${body}</section>`;
   return `<section class="page wrap">${crumbs([{ label: "Inicio", href: "#/" }, { label: "Políticas" }])}
-    <h1 class="h-display page-title">Políticas</h1><p class="page-sub">Envíos, cambios, garantía y tratamiento de datos de ${esc(t.nombre)}.</p>
+    <h1 class="h-display page-title">Políticas</h1><p class="page-sub">Cambios, envíos, garantía y tratamiento de datos de ${esc(t.nombre)}.</p>
     <div class="policies">
-    ${sec("envios", "Envíos", `<p>${esc(pd.textoEnvio)}</p><p>Despachamos desde Valledupar (Cesar) a toda Colombia mediante transportadora. El número de guía se comparte por WhatsApp una vez enviado el pedido. En Valledupar también puedes recoger tu pedido en nuestra tienda: ${esc(t.direccion)}.</p>`)}
-    ${sec("cambios", "Cambios y devoluciones", `<p>${esc(pd.politicaCambios)}</p>
-      <ul><li>El cambio aplica por talla o por otra referencia de igual o mayor valor (pagando la diferencia), sujeto a disponibilidad.</li>
-      <li>El producto debe estar sin uso, sin lavar, sin alteraciones y con etiquetas y empaque.</li>
-      <li>Los costos de envío del cambio corren por cuenta del cliente, salvo que el producto tenga un defecto o hayamos enviado una referencia o talla equivocada.</li></ul>`)}
+    ${sec("cambios", "Cambios y devoluciones", `<p>En ${esc(t.nombre)}, tu estilo es nuestra prioridad.</p>
+      <ul><li><b>No hacemos devoluciones de dinero</b> por cambios de opinión, talla, color o gusto personal.</li>
+      <li>Los cambios de prendas están sujetos a nuestras condiciones y a la disponibilidad de inventario.</li>
+      <li>Las prendas deben estar en perfecto estado: sin uso, sin lavar y con sus etiquetas originales.</li>
+      <li><b>Las prendas en PROMO no tienen cambio.</b> ¡Aprovecha nuestros precios especiales!</li>
+      <li>Esta política no limita los derechos del consumidor cuando la ley contemple garantías, retracto, devoluciones u otros derechos aplicables.</li></ul>
+      <p>Para solicitar un cambio, escríbenos por WhatsApp con tu número de pedido.</p>`)}
+    ${sec("envios", "Envíos", `<p>Enviamos a toda Colombia por la transportadora que elijas. El costo y el tiempo de entrega se confirman contigo por WhatsApp.</p>
+      <ul><li>Despachamos desde Valledupar (Cesar) a toda Colombia. El número de guía se comparte por WhatsApp cuando se envía el pedido.</li>
+      <li><b>Nos hacemos responsables hasta la entrega de la guía de envío.</b> A partir de ese momento, la responsabilidad del paquete recae sobre la transportadora seleccionada por el cliente.</li>
+      <li>No nos hacemos responsables por pérdidas ni incautaciones. Cualquier inconveniente posterior a la entrega de la guía debe gestionarse directamente con la empresa de transporte elegida.</li>
+      <li>En Valledupar también puedes recoger tu pedido en la tienda: ${esc(t.direccion)}.</li></ul>`)}
     ${sec("retracto", "Derecho de retracto", `<p>En compras a distancia (página web o WhatsApp), conforme al artículo 47 de la Ley 1480 de 2011 (Estatuto del Consumidor), puedes retractarte dentro de los 5 días hábiles siguientes a la entrega, devolviendo el producto en las mismas condiciones en que lo recibiste. Los costos de transporte de la devolución corren por tu cuenta y el dinero se reintegra dentro de los 30 días calendario siguientes. Aplican las excepciones previstas en la ley.</p>`)}
     ${sec("garantia", "Garantía", `<p>Si tu producto presenta un defecto, escríbenos por WhatsApp con tu número de pedido y fotos del producto. Revisamos cada caso y, según corresponda, cambiamos el producto, lo reparamos o devolvemos el dinero, de acuerdo con la garantía legal vigente en Colombia.</p>`)}
     ${sec("privacidad", "Tratamiento de datos personales", `<p>Los datos que registras (nombre, teléfono, correo y dirección) se usan únicamente para gestionar tus pedidos, entregas, cuenta y comunicaciones sobre tus compras, conforme a la Ley 1581 de 2012. No los vendemos ni los compartimos, salvo con la transportadora para realizar la entrega. Puedes consultar, actualizar o pedir la eliminación de tus datos escribiéndonos por WhatsApp${t.correo ? " o al correo " + esc(t.correo) : ""}.</p>`)}
     </div>
+    <p class="policy-sign">${esc(t.nombre).toUpperCase()} · Estilo urbano · Actitud · Exclusividad 💎</p>
     <p class="muted-text" style="font-size:12.5px;margin-top:24px">Si tienes dudas, escríbenos por <a class="link-btn" href="${esc(waLink())}" target="_blank" rel="noopener">WhatsApp</a>.</p>
   </section><div class="section"></div>`;
 }
@@ -2669,6 +2712,7 @@ function viewProduct(slug) {
         <a class="wa-ask" target="_blank" rel="noopener" href="${esc(waLink(`Hola ${s.tienda.nombre}, quiero información sobre: ${p.nombre} (Ref. ${p.ref}).`))}">${ICON.wa} Preguntar por WhatsApp</a>
         ${addiWidget(p)}
         <p class="stock-note" id="stockNote"></p>
+        ${p.enOferta ? `<p class="promo-note">Prenda en <b>PROMO</b>: no tiene cambio.</p>` : ""}
         <div class="acc">
           <details open><summary>Detalles <i></i></summary><div class="acc__body"><ul><li>Referencia: ${esc(p.ref)}</li><li>Categoría: ${esc(cat?.nombre || "")}</li>${p.linea ? `<li>Línea: ${esc(p.linea)}</li>` : ""}<li>Tallas: ${esc(sizes.join(", "))}</li>${colors.length ? `<li>Colores: ${esc(colors.map(c => c.nombre).join(", "))}</li>` : ""}</ul></div></details>
           <details><summary>Envíos <i></i></summary><div class="acc__body"><p style="margin:0">${esc(s.pedidos.textoEnvio)}</p></div></details>
@@ -2779,7 +2823,7 @@ function lineHTML(l) {
 }
 function totalsHTML(t) {
   return `<div class="sum"><span>Subtotal</span><span>${money(t.subtotal)}</span></div>
-    ${t.descuento ? `<div class="sum sum--bono"><span>Bono ${esc(t.cupon)}</span><span>-${money(t.descuento)}</span></div>` : ""}
+    ${t.descuento ? `<div class="sum sum--bono"><span>Cupón ${esc(t.cupon)}</span><span>-${money(t.descuento)}</span></div>` : ""}
     <div class="sum"><span>Envío</span><span class="muted">${t.envio == null ? "A coordinar" : money(t.envio)}</span></div>
     <div class="sum sum--total"><span>Total</span><span>${money(t.total)}</span></div>
     ${t.pending ? `<p class="cart-note">${t.pending} producto(s) con precio a confirmar. Te confirmamos el valor final por WhatsApp.</p>` : ""}`;
@@ -2796,7 +2840,7 @@ function afterCartChange() { updateCounts(); renderCart(); if (currentRoute().na
    CHECKOUT: Carrito → Datos de envío → Método de pago → Confirmación
    → (servidor) crear pedido + descontar stock → Página de confirmación → WhatsApp
    ========================================================================= */
-const checkout = { step: 1, data: null, pago: null, busy: false };
+const checkout = { step: 1, data: null, pago: null, busy: false, cupon: null };   // cupon: { codigo, tipo, valor, termina } validado en el servidor
 const STEPS = ["Carrito", "Datos de envío", "Método de pago", "Confirmación"];
 const SHIP_FIELDS = [
   { id: "nombre", label: "Nombre completo", req: true, auto: "name" },
@@ -2883,8 +2927,7 @@ function renderCheckoutStep() {
       <div class="co-actions co-actions--final"><button type="button" class="btn btn--ghost" data-co-back>Volver</button><button class="btn" id="placeOrder">Confirmar pedido</button></div>
     </div>${summary}</div>`;
     $("#placeOrder").onclick = placeOrder;
-    $$("[name=bono]").forEach(el => el.onchange = () => { checkout.cupon = el.value || null; renderCheckoutStep(); });
-    if (Store.user && !Loyalty.data && !Loyalty.loading) Loyalty.load().then(() => currentRoute().name === "checkout" && checkout.step === 4 && renderCheckoutStep());
+    Loyalty.mountCoupon();
   }
 }
 function goStep(n) { checkout.step = n; renderCheckoutStep(); $("#coRoot")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
@@ -2896,7 +2939,7 @@ async function placeOrder() {
   checkout.busy = true; btn.disabled = true; btn.textContent = "Registrando pedido…"; msg.textContent = "";
   try {
     const items = CartService.detail().map(l => ({ variant_id: l.vid, cantidad: l.qty }));
-    const order = await Api.createOrder(items, { ...checkout.data, cupon: Store.user && checkout.cupon ? checkout.cupon : "" }, checkout.pago);
+    const order = await Api.createOrder(items, { ...checkout.data, cupon: Store.user && checkout.cupon ? checkout.cupon.codigo : "" }, checkout.pago);
     try { order.link_token = await rpc("order_link", { p_order_id: order.id }); } catch {}   // si falta la migración 06, el pedido sigue sin enlace
     await PaymentGateway.iniciar(order);
     try { sessionStorage.setItem("lpc_order_" + order.numero, JSON.stringify(order)); } catch {}
@@ -3566,7 +3609,7 @@ function seriesByDay(orders, range, valueFn) {
 const Admin = {
   shell(active, content) {
     const nuevos = AdminData.orders.filter(o => ["nuevo", "pago_pendiente"].includes(o.estado)).length; const unread = AdminData.unread();
-    const links = [["", "Resumen"], ["ventas", "Ventas"], ["pedidos", "Pedidos", nuevos], ["productos", "Productos"], ["inventario", "Inventario"], ["clientes", "Clientes"],
+    const links = [["", "Resumen"], ["ventas", "Ventas"], ["pedidos", "Pedidos", nuevos], ["productos", "Productos"], ["inventario", "Inventario"], ["clientes", "Clientes"], ["cupones", "Cupones"],
       ["facturacion", "Facturación"], ["notificaciones", "Notificaciones", unread, "notifNav"], ["estadisticas", "Estadísticas"], ["ajustes", "Configuración"]];
     return `<div class="adm"><aside class="adm__side"><span class="adm__logo"><img src="assets/logo-nav.png" alt="${esc(S().tienda.nombre)}" width="180" height="116"></span><small>Administración</small>
         ${links.map(([k, l, n, id]) => `<a href="#/admin${k ? "/" + k : ""}" ${active === k ? 'aria-current="page"' : ""}>${l}<em ${id ? `id="${id}"` : ""} ${n ? "" : "hidden"}>${n || ""}</em></a>`).join("")}
@@ -4234,6 +4277,61 @@ const Admin = {
     });
   },
 
+  /* ---------- Cupones (supabase/10_cupones.sql) ---------- */
+  coupons() {
+    return this.shell("cupones", `<div class="adm__head"><div><h1>Cupones</h1><p>Códigos aleatorios de un solo uso, con vigencia. Los bonos del Club La Percha se crean solos cada ${Loyalty.cfg().compras} compras pagadas.</p></div>
+        <button class="btn" id="cpNew">Crear cupón</button></div>
+      <div class="adm-stats" id="cpStats"></div>
+      <div class="tools"><input type="search" id="cpQ" placeholder="Buscar por código, cliente o correo" aria-label="Buscar cupones">
+        <select id="cpF" aria-label="Filtrar por estado"><option value="">Todos</option><option value="disponible">Disponibles</option><option value="usado">Usados</option><option value="vencido">Vencidos</option><option value="inactivo">Desactivados</option></select></div>
+      <div id="cpBox">${loaderHTML("Cargando cupones…")}</div>`);
+  },
+  async mountCoupons() {
+    const box = $("#cpBox"); if (!box) return;
+    let list = [];
+    try { list = await rpc("admin_coupons"); } catch (e) { box.innerHTML = `<div class="card-w"><p class="muted-text" style="margin:0">${esc(friendly(e))}</p></div>`; return; }
+    const ST = { disponible: ["ok", "Disponible"], usado: ["dark", "Usado"], vencido: ["err", "Vencido"], inactivo: ["", "Desactivado"] };
+    const cnt = k => list.filter(c => c.estado === k).length;
+    $("#cpStats").innerHTML = [["Disponibles", cnt("disponible")], ["Usados", cnt("usado")], ["Vencidos", cnt("vencido")], ["Valor disponible", money(list.filter(c => c.estado === "disponible").reduce((a, c) => a + Number(c.valor), 0))]]
+      .map(([l, v]) => `<div class="card-w"><small class="muted-text">${l}</small><b style="display:block;font-size:22px;margin-top:4px">${v}</b></div>`).join("");
+    const draw = () => {
+      const q = norm($("#cpQ").value), f = $("#cpF").value;
+      const rows = list.filter(c => (!f || c.estado === f) && (!q || norm([c.codigo, c.cliente, c.email, c.nota].join(" ")).includes(q)));
+      box.innerHTML = rows.length ? `<div class="table-wrap"><table class="t"><thead><tr><th>Código</th><th>Valor</th><th>Cliente</th><th>Origen</th><th>Estado</th><th>Vence</th><th>Uso</th><th></th></tr></thead><tbody>
+        ${rows.map(c => `<tr><td><b class="mono">${esc(c.codigo)}</b> <button type="button" class="link-btn" data-copy="${esc(c.codigo)}">Copiar</button></td>
+          <td>${money(c.valor)}</td><td>${c.email ? `${esc(c.cliente || "")}<br><span class="ref" style="text-transform:none;letter-spacing:0">${esc(c.email)}</span>` : '<span class="muted-text">Cualquier cliente con cuenta</span>'}</td>
+          <td>${c.programa === "fidelidad" ? "Club (5 compras)" : "Manual"}${c.nota ? `<br><small class="muted-text">${esc(c.nota)}</small>` : ""}</td>
+          <td><span class="tag ${ST[c.estado][0]}">${ST[c.estado][1]}</span></td>
+          <td>${c.termina ? new Date(c.termina).toLocaleDateString("es-CO") : "—"}</td>
+          <td>${c.pedido ? `<a class="link-btn" href="#/admin/pedidos/${esc(c.pedido)}">${esc(c.pedido)}</a>` : c.usado_at ? fmtDate(c.usado_at) : "—"}</td>
+          <td>${c.estado === "usado" ? "" : `<button type="button" class="link-btn ${c.activo ? "danger" : ""}" data-cp-toggle="${c.id}" data-on="${c.activo ? 0 : 1}">${c.activo ? "Desactivar" : "Activar"}</button>`}</td></tr>`).join("")}
+        </tbody></table></div>` : `<div class="card-w"><p class="muted-text" style="margin:0">${list.length ? "Ningún cupón coincide con el filtro." : "Aún no hay cupones. Se crearán solos cuando un cliente complete sus compras, o puedes crear uno manual."}</p></div>`;
+      $$("[data-cp-toggle]").forEach(b => b.onclick = async () => {
+        try { await rpc("admin_set_coupon_active", { p_id: Number(b.dataset.cpToggle), p_activo: b.dataset.on === "1" }); toast(b.dataset.on === "1" ? "Cupón activado" : "Cupón desactivado"); this.mountCoupons(); }
+        catch (e) { toast(friendly(e)); }
+      });
+    };
+    $("#cpQ").oninput = draw; $("#cpF").onchange = draw; draw();
+    $("#cpNew").onclick = () => {
+      openModal("Crear cupón", `<form id="cpForm" class="stack" novalidate>
+        <div class="field"><label for="cpV">Valor del descuento (COP)</label><input id="cpV" type="number" min="1000" step="1000" value="${Loyalty.cfg().valor}" required></div>
+        <div class="field"><label for="cpE">Correo del cliente (opcional)</label><input id="cpE" type="email" placeholder="cliente@gmail.com"><span class="hint">Si lo dejas vacío, el primer cliente con cuenta que lo use lo gasta. Con correo, solo esa persona puede usarlo.</span></div>
+        <div class="field"><label for="cpM">Vigencia</label><select id="cpM"><option value="1">1 mes</option><option value="3" selected>3 meses</option><option value="6">6 meses</option></select></div>
+        <div class="field"><label for="cpN">Nota interna (opcional)</label><input id="cpN" maxlength="300" placeholder="Ej.: compensación pedido LP-0012"></div>
+        <p class="form-msg" id="cpMsg" role="status"></p>
+        <div class="co-actions"><button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button><button class="btn" type="submit">Crear cupón</button></div></form>`);
+      $("#cpForm").onsubmit = async e => {
+        e.preventDefault(); const m = $("#cpMsg");
+        try {
+          const r = await rpc("admin_create_coupon", { p_valor: Number($("#cpV").value), p_email: $("#cpE").value.trim() || null, p_meses: Number($("#cpM").value), p_nota: $("#cpN").value.trim() || null });
+          $("#cpForm").innerHTML = `<p style="margin:0">Cupón creado. Compártelo con el cliente:</p><p class="coupon-created mono">${esc(r.codigo)}</p>
+            <div class="co-actions"><button type="button" class="btn btn--ghost" data-copy="${esc(r.codigo)}">Copiar código</button><button type="button" class="btn" data-close-modal>Listo</button></div>`;
+          this.mountCoupons();
+        } catch (err) { m.textContent = friendly(err); }
+      };
+    };
+  },
+
   /* ---------- Configuración ---------- */
   settings() {
     const s = S(); const f = (id, label, val, type = "text", attrs = "") => `<div class="field"><label for="${id}">${label}</label><input id="${id}" name="${id}" type="${type}" value="${esc(val ?? "")}" ${attrs}></div>`;
@@ -4801,36 +4899,63 @@ const Loyalty = {
     this.loading = rpc("my_loyalty").then(d => (this.data = d), () => (this.data = null)).finally(() => { this.loading = null; });
     return this.loading;
   },
-  available() { return (this.data?.cupones || []).filter(c => !c.usado); },
-  selected() { return Store.user && checkout.cupon ? this.available().find(c => c.codigo === checkout.cupon) || null : null; },
+  available() { return (this.data?.cupones || []).filter(c => !c.usado && !c.vencido); },
+  selected() { return Store.user && checkout.cupon ? checkout.cupon : null; },
   applyTo(t) {
     const c = this.selected(); if (!c || !t.subtotal) return t;
     const descuento = Math.min(t.subtotal, c.tipo === "porcentaje" ? Math.round(t.subtotal * c.valor / 100) : Number(c.valor));
     return { ...t, descuento, cupon: c.codigo, total: t.total - descuento };
   },
+  vence(iso) { return iso ? new Date(iso).toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" }) : ""; },
   dots(n, meta) { return `<span class="club-dots" aria-hidden="true">${Array.from({ length: meta }, (_, i) => `<i class="${i < n ? "on" : ""}">${i === meta - 1 ? ICON_GIFT : ""}</i>`).join("")}</span>`; },
+  /* Paso 4 del checkout: campo "Cupón de descuento" + cupones disponibles del cliente */
   checkoutHTML() {
-    if (!this.on()) return "";
-    const cfg = this.cfg();
-    if (!Store.user) return `<section class="club-co"><h3>Bono de cliente frecuente</h3><p>Crea tu cuenta gratis y gana un bono de <b>${money(cfg.valor)}</b> cada ${cfg.compras} compras. <a class="link-btn" href="#/cuenta/registro?next=checkout">Crear cuenta</a></p></section>`;
-    if (!this.data) return `<section class="club-co"><h3>Tus bonos</h3><p class="muted-text">Cargando…</p></section>`;
-    const av = this.available();
-    if (!av.length) { const d = this.data; return `<section class="club-co"><h3>Tus bonos</h3>${this.dots(d.progreso, d.meta)}<p>Llevas <b>${d.progreso} de ${d.meta}</b> compras pagadas. Al completar ${d.meta} recibes un bono de <b>${money(d.valor)}</b>.</p></section>`; }
-    return `<section class="club-co"><h3>Usa tu bono</h3><div class="pay club-pick" role="radiogroup" aria-label="Bonos disponibles">
-      ${av.map(c => `<label><input type="radio" name="bono" value="${esc(c.codigo)}" ${checkout.cupon === c.codigo ? "checked" : ""}><span><b>Bono ${money(c.valor)}</b><small>Código ${esc(c.codigo)}</small></span><span></span></label>`).join("")}
-      <label><input type="radio" name="bono" value="" ${checkout.cupon ? "" : "checked"}><span><b>No usar bono ahora</b><small>Guárdalo para otra compra</small></span><span></span></label></div></section>`;
+    const c = this.selected(), cfg = this.cfg();
+    if (c) return `<section class="coupon-box is-on"><h3>${ICON_GIFT}<span>Cupón de descuento</span></h3>
+      <div class="coupon-applied"><div><b>${esc(c.codigo)}</b><small>-${money(this.applyTo(CartService.totals()).descuento || c.valor)}${c.termina ? " · vence el " + esc(this.vence(c.termina)) : ""}</small></div>
+      <button type="button" class="link-btn" data-coupon-remove>Quitar</button></div></section>`;
+    const av = Store.user ? this.available() : [];
+    return `<section class="coupon-box"><h3>${ICON_GIFT}<span>Cupón de descuento</span></h3>
+      <form class="coupon-form" id="couponForm" novalidate autocomplete="off">
+        <label class="sr-only" for="couponIn">Código del cupón</label>
+        <input id="couponIn" name="codigo" placeholder="Ej.: LP-XXXX-XXXX-XXXX" maxlength="32" autocapitalize="characters" spellcheck="false" ${Store.user ? "" : "disabled"}>
+        <button class="btn btn--sm" type="submit" ${Store.user ? "" : "disabled"}>Aplicar</button>
+      </form>
+      <p class="form-msg" id="couponMsg" role="status"></p>
+      ${Store.user ? "" : `<p class="coupon-sub"><a class="link-btn" href="#/cuenta?next=checkout">Inicia sesión</a> para usar un cupón. ¿No tienes cuenta? <a class="link-btn" href="#/cuenta/registro?next=checkout">Créala gratis</a> y gana ${money(cfg.valor)} cada ${cfg.compras} compras.</p>`}
+      ${av.length ? `<p class="coupon-sub">Tus cupones disponibles</p><div class="coupon-list">${av.map(x => `<button type="button" class="coupon-chip" data-coupon-use="${esc(x.codigo)}"><b>${money(x.valor)}</b><span>${esc(x.codigo)}</span><small>Vence el ${esc(this.vence(x.termina))}</small><em>Usar</em></button>`).join("")}</div>` : ""}
+      ${Store.user && this.data && !av.length && cfg.activo ? `<p class="coupon-sub">Club La Percha: llevas <b>${this.data.progreso} de ${this.data.meta}</b> compras para tu bono de ${money(this.data.valor)}.</p>` : ""}
+    </section>`;
+  },
+  async apply(code) {
+    const msg = $("#couponMsg"); const set = (t, ok) => { if (msg) { msg.textContent = t; msg.classList.toggle("ok", !!ok); } };
+    code = String(code || "").trim();
+    if (!code) return set("Escribe el código de tu cupón.");
+    set("Validando cupón…", true);
+    try {
+      const c = await rpc("validate_coupon", { p_codigo: code, p_subtotal: CartService.totals().subtotal || null });
+      checkout.cupon = { codigo: c.codigo, tipo: c.tipo, valor: Number(c.valor), termina: c.termina };
+      renderCheckoutStep(); toast(`Cupón ${c.codigo} aplicado`);
+    } catch (e) { set(friendly(e)); }
+  },
+  mountCoupon() {
+    const f = $("#couponForm"); if (f) f.onsubmit = e => { e.preventDefault(); this.apply($("#couponIn").value); };
+    $$("[data-coupon-use]").forEach(b => b.onclick = () => this.apply(b.dataset.couponUse));
+    const r = $("[data-coupon-remove]"); if (r) r.onclick = () => { checkout.cupon = null; renderCheckoutStep(); };
+    if (Store.user && !this.data && !this.loading) this.load().then(() => currentRoute().name === "checkout" && checkout.step === 4 && !checkout.cupon && renderCheckoutStep());
   },
   accountHTML() {
     if (!this.on() || !this.data) return "";
-    const d = this.data, av = this.available(), used = (d.cupones || []).filter(c => c.usado);
+    const d = this.data, av = this.available(), used = (d.cupones || []).filter(c => c.usado || c.vencido);
     const falta = d.meta - d.progreso;
     return `<section class="club-card">
       <div class="club-card__head"><span class="club-card__ic">${ICON_GIFT}</span><div><p class="club-card__eyebrow">Club La Percha</p>
         <h3>${av.length ? `Tienes ${av.length === 1 ? "un bono" : av.length + " bonos"} de ${money(d.valor)}` : `Te ${falta === 1 ? "falta 1 compra" : "faltan " + falta + " compras"} para tu bono`}</h3></div></div>
       ${this.dots(d.progreso, d.meta)}
       <p class="club-card__txt">Cada ${d.meta} compras pagadas te regalamos un bono de <b>${money(d.valor)}</b> para cualquier producto. Llevas <b>${d.progreso} de ${d.meta}</b>${d.compras > d.progreso ? ` · ${d.compras} compras en total` : ""}.</p>
-      ${av.length ? `<div class="club-codes">${av.map(c => `<div class="club-code"><span>Código</span><b>${esc(c.codigo)}</b><small>${money(c.valor)} · úsalo al finalizar tu compra</small></div>`).join("")}</div><a class="btn btn--sm" href="#/tienda">Usar mi bono</a>` : ""}
-      ${used.length ? `<p class="club-card__used">Bonos usados: ${used.map(c => `${esc(c.codigo)}${c.pedido ? " (pedido " + esc(c.pedido) + ")" : ""}`).join(" · ")}</p>` : ""}
+      ${av.length ? `<div class="club-codes">${av.map(c => `<div class="club-code"><span>Código</span><b>${esc(c.codigo)}</b><small>${money(c.valor)} · vence el ${esc(this.vence(c.termina))}</small></div>`).join("")}</div>
+        <p class="club-card__txt" style="font-size:12.5px">Escríbelo en <b>"Cupón de descuento"</b> al finalizar tu compra. Cada cupón sirve una sola vez.</p><a class="btn btn--sm" href="#/tienda">Usar mi cupón</a>` : ""}
+      ${used.length ? `<p class="club-card__used">Usados o vencidos: ${used.map(c => `${esc(c.codigo)} (${c.usado ? (c.pedido ? "pedido " + esc(c.pedido) : "usado") : "vencido"})`).join(" · ")}</p>` : ""}
     </section>`;
   }
 };
@@ -5181,6 +5306,7 @@ async function render() {
       else if (sec === "pedidos") { html = Admin.orders(r.query); mount = () => Admin.mountOrders(); }
       else if (sec === "inventario") { html = Admin.inventory(r.query); mount = () => Admin.mountInventory(); }
       else if (sec === "clientes") { html = Admin.customers(); mount = () => Admin.mountCustomers(); }
+      else if (sec === "cupones") { html = Admin.coupons(); mount = () => Admin.mountCoupons(); }
       else if (sec === "ajustes") { html = Admin.settings(); mount = () => Admin.mountSettings(); }
       else if (sec === "estadisticas") { html = Admin.stats(); mount = () => Admin.mountStats(); }
       else if (sec === "ventas" && r.sub === "nueva") { html = Admin.newSale(); mount = () => AdminData.salesReady && Admin.mountNewSale(); }
