@@ -1559,6 +1559,76 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
 
 .pay-card{border-color:#b9d8c3;background:#f3faf5}
 .pay-note{margin:8px 0 10px;padding:10px 12px;background:#fff;border:1px solid var(--line);font-size:14px;white-space:pre-wrap}
+
+/* ---------- Ícono de cuenta en el header ---------- */
+#accountBtn.is-in::after{content:"";position:absolute;right:9px;top:9px;width:7px;height:7px;border-radius:50%;background:var(--brand-gold,#c9a24e);box-shadow:0 0 0 2px var(--bg,#fff)}
+@media (max-width:380px){.nav__icons .icon-btn{width:34px}.nav__left .icon-btn{width:36px}}
+/* ---------- Club La Percha ---------- */
+.club-dots{display:flex;gap:8px;margin:14px 0}
+.club-dots i{flex:1;height:30px;max-width:44px;border:1px solid rgba(201,162,78,.45);display:grid;place-items:center;color:#c9a24e;border-radius:3px}
+.club-dots i.on{background:linear-gradient(135deg,#d9b866,#a8832f);border-color:transparent}
+.club-dots i svg{width:16px;height:16px}
+.club-promo{position:fixed;left:clamp(16px,2vw,28px);bottom:calc(clamp(16px,2vw,28px) + env(safe-area-inset-bottom));z-index:69;font-family:inherit}
+.club-promo[data-state="off"],.club-promo:not([data-state]){display:none}
+body.is-admin .club-promo{display:none}
+.club-promo__card{position:relative;width:min(360px,calc(100vw - 32px));background:#0f0f0f;color:#f3efe6;padding:24px 24px 20px;border-top:3px solid #c9a24e;box-shadow:0 24px 60px rgba(0,0,0,.35);
+  transform-origin:bottom left;transition:opacity .45s var(--ease-out,ease),transform .55s var(--ease-out,ease),visibility 0s}
+.club-promo[data-state="min"] .club-promo__card{opacity:0;transform:translateY(16px) scale(.94);visibility:hidden;pointer-events:none;position:absolute;bottom:0;left:0;transition:opacity .3s,transform .35s,visibility 0s .35s}
+.club-promo[data-state="open"] .club-promo__card{animation:clubIn .65s var(--ease-out,ease) both}
+@keyframes clubIn{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+.club-promo__x{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;color:#bdb8ad;font-size:13px;display:grid;place-items:center;transition:background .2s,color .2s}
+.club-promo__x:hover{background:rgba(255,255,255,.08);color:#fff}
+.club-promo__top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.club-promo__ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(201,162,78,.14);color:#d9b866}
+.club-promo__eyebrow{margin:0;font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:#c9a24e;font-weight:700}
+.club-promo__title{margin:0 0 8px;font-family:var(--f-head,inherit);font-size:24px;line-height:1.1;text-transform:uppercase;letter-spacing:-.01em;color:#fff}
+.club-promo__title em{font-style:normal;color:#d9b866}
+.club-promo__txt{margin:0;font-size:13.5px;line-height:1.55;color:#cfc9bd}
+.club-promo .club-dots{margin:16px 0 18px}
+.club-promo__btns{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.club-promo__cta{display:inline-flex;align-items:center;justify-content:center;padding:13px 20px;background:linear-gradient(135deg,#e2c477,#b08a3a);color:#111;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;text-decoration:none;transition:filter .25s,transform .25s}
+.club-promo__cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.club-promo__link{font-size:12.5px;color:#cfc9bd;text-decoration:underline;text-underline-offset:3px}
+.club-promo__link:hover{color:#fff}
+.club-promo__pill{display:none;align-items:center;gap:8px;height:48px;padding:0 18px 0 14px;border-radius:999px;background:#0f0f0f;color:#d9b866;border:1px solid rgba(201,162,78,.5);box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;animation:clubIn .5s var(--ease-out,ease) both}
+.club-promo__pill span{color:#f3efe6}
+.club-promo__pill:hover{border-color:#d9b866}
+.club-promo[data-state="min"] .club-promo__pill{display:inline-flex}
+@media (max-width:640px){
+  .club-promo{left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom))}
+  .club-promo[data-state="min"]{right:auto;bottom:calc(clamp(16px,2vw,28px) + env(safe-area-inset-bottom) + 4px)}
+  .club-promo__card{width:100%;padding:20px 18px 18px}
+  .club-promo__title{font-size:21px}
+  .club-promo__pill{height:46px;padding:0 14px 0 12px;font-size:10.5px}
+}
+.club-co{border:1px solid rgba(201,162,78,.45);background:linear-gradient(180deg,rgba(201,162,78,.07),transparent);padding:16px 18px}
+.club-co h3{margin-top:0}
+.club-co p{margin:0}
+.club-co .club-dots{margin:6px 0 12px}
+.club-pick{margin-top:6px}
+.sum--bono span:last-child{color:#2e7d4f;font-weight:600}
+.club-card{background:#0f0f0f;color:#f3efe6;padding:24px;margin:0 0 22px;border-top:3px solid #c9a24e}
+.club-card__head{display:flex;gap:14px;align-items:center}
+.club-card__ic{width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;background:rgba(201,162,78,.14);color:#d9b866}
+.club-card__eyebrow{margin:0 0 4px;font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:#c9a24e;font-weight:700}
+.club-card h3{margin:0;font-size:19px;line-height:1.2;color:#fff;text-transform:uppercase}
+.club-card__txt{margin:0 0 14px;font-size:14px;line-height:1.6;color:#cfc9bd}
+.club-card__txt b{color:#fff}
+.club-codes{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px}
+.club-code{border:1px dashed #c9a24e;padding:12px 16px;display:grid;gap:2px;min-width:200px}
+.club-code span{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#bdb8ad}
+.club-code b{font-size:20px;letter-spacing:.12em;color:#d9b866;font-family:ui-monospace,Menlo,Consolas,monospace}
+.club-code small{font-size:12px;color:#bdb8ad}
+.club-card .btn{background:#c9a24e;color:#111;border-color:#c9a24e}
+.club-card__used{margin:14px 0 0;font-size:12px;color:#8f897d}
+.club-inline{display:flex;align-items:center;gap:14px;text-align:left;margin:22px auto 0;max-width:560px;padding:16px 18px;background:#0f0f0f;color:#f3efe6;border-left:3px solid #c9a24e}
+.club-inline p{margin:0;font-size:13.5px;line-height:1.5;color:#cfc9bd;flex:1}
+.club-inline p b{color:#fff}
+.club-inline__ic{color:#d9b866;flex:none}
+.club-inline .btn{background:#c9a24e;color:#111;border-color:#c9a24e;flex:none}
+.club-inline--auth{margin:0 0 20px}
+@media (max-width:560px){.club-inline{flex-wrap:wrap}.club-inline .btn{width:100%}}
+@media (prefers-reduced-motion:reduce){.club-promo__card,.club-promo__pill{animation:none!important;transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
@@ -1590,7 +1660,7 @@ body.theme-light .btn--ghost:hover{color:#fff;border-color:#111}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20s-7.5-4.6-7.5-10.1A4.2 4.2 0 0 1 12 7.6a4.2 4.2 0 0 1 7.5 2.3C19.5 15.4 12 20 12 20Z"/></svg>
         <span class="count" id="favCount" aria-hidden="true"></span>
       </a>
-      <a class="icon-btn hide-sm" href="#/cuenta" id="accountBtn" aria-label="Mi cuenta">
+      <a class="icon-btn" href="#/cuenta" id="accountBtn" aria-label="Mi cuenta">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>
       </a>
       <button class="icon-btn" id="cartBtn" aria-label="Abrir carrito" aria-controls="cart">
@@ -1757,6 +1827,7 @@ const DEFAULT_SETTINGS = {
             mapaDireccion: "Carrera 19E2 #13B-46, Valledupar, Cesar", instagram: "https://www.instagram.com/laperchavup/",
             tiktok: "https://www.tiktok.com/@lapercha_store17", facebook: "", correo: "", moneda: "COP", locale: "es-CO", logo: "", temaVisual: "claro" },
   whatsapp: { numero: "573144543114", mensajeGeneral: "Hola La Percha, quiero información." },
+  fidelidad: { activo: true, compras: 5, valor: 20000 },
   catalogo: { permitirSinPrecio: true, porPagina: 24 },
   pagos: {
     contraentrega: { activo: true, nombre: "Pago contra entrega", descripcion: "Pagas en efectivo al recibir tu pedido (según cobertura de la transportadora)." },
@@ -1806,6 +1877,10 @@ const CATALOG_SEED_URL = "img/catalogo/catalogo.json";   // catálogo de La Perc
 const Store = { addresses: [], ready: false, error: null, settings: structuredClone(DEFAULT_SETTINGS), categories: [], products: [], user: null, profile: null, favs: new Set() };
 
 const ERR = {
+  EMAIL_REQUERIDO: "Escribe un correo electrónico válido: allí te enviamos la factura.",
+  CUPON_INVALIDO: "Ese bono ya no está disponible.",
+  CUPON_REQUIERE_CUENTA: "Inicia sesión para usar tu bono.",
+  CUPON_SIN_PRECIO: "El bono se aplica sobre productos con precio confirmado.",
   NO_AUTORIZADO: "No tienes permisos para esta acción.",
   DATOS_INCOMPLETOS: "Completa todos los datos de envío.",
   TELEFONO_INVALIDO: "El número de teléfono no es válido.",
@@ -1835,6 +1910,7 @@ function friendly(e) {
   if (code === "STOCK_INSUFICIENTE") { const [what, left] = rest.split("|"); return `Stock insuficiente: ${what}. ${Number(left) > 0 ? "Disponibles: " + left + "." : "Está agotado."}`; }
   if (code === "PRODUCTO_NO_DISPONIBLE") return `${rest} ya no está disponible.`;
   if (code === "PRECIO_NO_DISPONIBLE") return `${rest} aún no tiene precio. Consúltalo por WhatsApp.`;
+  if (code === "CUPON_MINIMO") return `El bono aplica para compras desde ${money(rest)}.`;
   if (code === "PRECIO_REQUERIDO") return `Escribe el precio de venta de ${rest}.`;
   if (code === "DESCUENTO_INVALIDO") return rest === "venta" ? "El descuento general supera el valor de la venta." : `El descuento de ${rest} no es válido.`;
   if (code === "STOCK_NEGATIVO" && rest) { const [what, left] = rest.split("|"); return `No se puede dejar stock negativo: ${what} (hay ${left}).`; }
@@ -2109,7 +2185,7 @@ function orderWhatsAppText(o) {
   });
   L.push("");
   L.push(`Subtotal: ${money(o.subtotal)}${o.items_sin_precio ? ` (+ ${o.items_sin_precio} producto(s) con precio a confirmar)` : ""}`);
-  if (Number(o.descuento) > 0) L.push(`Descuento: -${money(o.descuento)}`);
+  if (Number(o.descuento) > 0) L.push(`${o.cupon_codigo ? "Bono " + o.cupon_codigo : "Descuento"}: -${money(o.descuento)}`);
   L.push(`Envío: ${o.envio == null ? "a coordinar" : money(o.envio)}`);
   L.push(`*Total: ${money(o.total)}*${o.items_sin_precio || o.envio == null ? " (sujeto a confirmación)" : ""}`);
   L.push(`Método de pago: ${PaymentGateway.label(o.metodo_pago)}`);
@@ -2242,6 +2318,7 @@ function updateCounts() {
   $("#cartBtn").setAttribute("aria-label", `Abrir carrito (${c} ${c === 1 ? "producto" : "productos"})`);
   $("#cartTitleCount").textContent = c ? `(${c})` : "";
   $("#accountBtn").setAttribute("aria-label", Store.user ? `Mi cuenta (${Store.profile?.nombre || Store.user.email})` : "Iniciar sesión o crear cuenta");
+  $("#accountBtn").classList.toggle("is-in", !!Store.user);
 }
 
 /* =========================================================================
@@ -2702,6 +2779,7 @@ function lineHTML(l) {
 }
 function totalsHTML(t) {
   return `<div class="sum"><span>Subtotal</span><span>${money(t.subtotal)}</span></div>
+    ${t.descuento ? `<div class="sum sum--bono"><span>Bono ${esc(t.cupon)}</span><span>-${money(t.descuento)}</span></div>` : ""}
     <div class="sum"><span>Envío</span><span class="muted">${t.envio == null ? "A coordinar" : money(t.envio)}</span></div>
     <div class="sum sum--total"><span>Total</span><span>${money(t.total)}</span></div>
     ${t.pending ? `<p class="cart-note">${t.pending} producto(s) con precio a confirmar. Te confirmamos el valor final por WhatsApp.</p>` : ""}`;
@@ -2727,7 +2805,7 @@ const SHIP_FIELDS = [
   { id: "barrio", label: "Barrio", req: true },
   { id: "direccion", label: "Dirección", req: true, auto: "street-address", full: true },
   { id: "info_adicional", label: "Información adicional para la entrega", area: true, full: true, hint: "Apartamento, puntos de referencia, horario preferido… (opcional)" },
-  { id: "email", label: "Correo electrónico (opcional)", type: "email", auto: "email", full: true, hint: "Si luego creas una cuenta con este correo, verás este pedido en tu historial." }
+  { id: "email", label: "Correo electrónico", req: true, type: "email", auto: "email", full: true, hint: "Aquí te enviamos la factura cuando confirmemos tu pago." }
 ];
 function viewCheckout() {
   return `<section class="page wrap" id="coRoot">${crumbs([{ label: "Inicio", href: "#/" }, { label: "Finalizar compra" }])}
@@ -2740,7 +2818,7 @@ function renderCheckoutStep() {
   if (!d.length) { $("#stepper").innerHTML = ""; box.innerHTML = `<div class="done"><h2 class="h-display" style="font-size:clamp(34px,5vw,56px)">Tu carrito está vacío</h2><p>Agrega productos para continuar con tu pedido.</p><div class="btns"><a href="#/tienda" class="btn">Ir a la tienda</a></div></div>`; return; }
   if (checkout.step >= 3 && !checkout.data) checkout.step = 2;
   $("#stepper").innerHTML = STEPS.map((s, i) => `<li class="${i + 1 < checkout.step ? "done" : i + 1 === checkout.step ? "cur" : ""}" ${i + 1 === checkout.step ? 'aria-current="step"' : ""}><b>${i + 1 < checkout.step ? "✓" : i + 1}</b><span>${s}</span></li>`).join("");
-  const t = CartService.totals();
+  const t = Loyalty.applyTo(CartService.totals());
   const summary = `<aside class="summary" aria-label="Resumen del pedido"><h2 class="sum-title">Resumen</h2>
     <div class="lines">${d.map(l => { const im = l.p.imagenes.find(i => i.color && i.color === l.color) || l.p.imagenes[0]; return `<div class="line"><span class="line__img">${im ? img(Catalog.imageSm(im.src), l.p.nombre) : ""}<span class="q">${l.qty}</span></span><div><div class="line__top"><p class="line__name">${esc(l.p.nombre)}</p><span class="price" style="font-size:13.5px">${l.total == null ? "A confirmar" : money(l.total)}</span></div><p class="line__meta" style="margin-bottom:0">Talla ${esc(l.talla)}${l.color ? " · " + esc(l.color) : ""}</p></div></div>`; }).join("")}</div>
     ${totalsHTML(t)}</aside>`;
@@ -2759,7 +2837,7 @@ function renderCheckoutStep() {
       <fieldset><legend><h2><span>2</span>Datos de envío</h2></legend><div class="fields">
         ${SHIP_FIELDS.filter(f => !(Store.user && f.id === "email")).map(f => `<div class="field ${f.full ? "full" : ""}"><label for="f_${f.id}">${f.label}${f.req ? " *" : ""}</label>
           ${f.area ? `<textarea id="f_${f.id}" name="${f.id}">${esc(base[f.id] || "")}</textarea>` : `<input id="f_${f.id}" name="${f.id}" type="${f.type || "text"}" ${f.auto ? `autocomplete="${f.auto}"` : ""} ${f.req ? "required" : ""} value="${esc(base[f.id] || "")}" ${f.type === "tel" ? 'inputmode="tel"' : ""} aria-describedby="e_${f.id}${f.hint ? " h_" + f.id : ""}">`}
-          ${f.hint ? `<span class="hint" id="h_${f.id}">${f.hint}</span>` : ""}<span class="err" id="e_${f.id}">${f.id === "telefono" ? "Ingresa un número válido (mínimo 7 dígitos)." : f.id === "email" ? "Correo no válido." : "Campo obligatorio."}</span></div>`).join("")}
+          ${f.hint ? `<span class="hint" id="h_${f.id}">${f.hint}</span>` : ""}<span class="err" id="e_${f.id}">${f.id === "telefono" ? "Ingresa un número válido (mínimo 7 dígitos)." : f.id === "email" ? "Escribe un correo válido (ej.: nombre@gmail.com)." : "Campo obligatorio."}</span></div>`).join("")}
       </div>${Store.user ? `<label class="check-row"><input type="checkbox" name="guardar" ${addrs.length ? "" : "checked"}> Guardar esta dirección en mi cuenta</label>` : ""}</fieldset>
       <div class="co-actions"><button type="button" class="btn btn--ghost" data-co-back>Volver</button><button class="btn" type="submit">Continuar al pago</button></div>
     </form>${summary}</div>`;
@@ -2767,7 +2845,7 @@ function renderCheckoutStep() {
     const validate = el => {
       let ok = el.required ? el.value.trim().length > 0 : true;
       if (el.name === "telefono") ok = digits(el.value).length >= 7;
-      if (el.name === "email" && el.value.trim()) ok = /^\S+@\S+\.\S+$/.test(el.value.trim());
+      if (el.name === "email") ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(el.value.trim());
       el.closest(".field").classList.toggle("invalid", !ok); el.setAttribute("aria-invalid", !ok); return ok;
     };
     $$("input", form).forEach(el => { if (el.type === "checkbox" || el.type === "radio") return; el.addEventListener("blur", () => validate(el)); el.addEventListener("input", () => el.closest(".field").classList.contains("invalid") && validate(el)); });
@@ -2798,12 +2876,15 @@ function renderCheckoutStep() {
     box.innerHTML = `<div class="co"><div class="review">
       <section><h3>Datos de envío <button type="button" data-co-goto="2">Editar</button></h3><p><b>${esc(c.nombre)}</b> · ${esc(c.telefono)}</p><p>${esc(c.direccion)}, barrio ${esc(c.barrio)}</p><p>${esc(c.ciudad)}</p>${c.info_adicional ? `<p class="muted-text">${esc(c.info_adicional)}</p>` : ""}</section>
       <section><h3>Método de pago <button type="button" data-co-goto="3">Editar</button></h3><p>${esc(PaymentGateway.label(checkout.pago))}</p><p class="muted-text">${esc(S().pagos[checkout.pago]?.descripcion || "")}</p></section>
+      ${Loyalty.checkoutHTML()}
       <section><h3>Productos <button type="button" data-co-goto="1">Editar</button></h3><div class="mini-lines">${d.map(l => { const im = l.p.imagenes.find(i => i.color && i.color === l.color) || l.p.imagenes[0]; return `<div>${im ? img(Catalog.imageSm(im.src), "") : "<span></span>"}<span>${esc(l.p.nombre)}<small>Talla ${esc(l.talla)}${l.color ? " · " + esc(l.color) : ""} · ${l.qty} × ${l.unit == null ? "a confirmar" : money(l.unit)}</small></span><b>${l.total == null ? "—" : money(l.total)}</b></div>`; }).join("")}</div></section>
       <p class="co-note">Al confirmar, registramos tu pedido y reservamos las unidades. Después podrás enviarlo por WhatsApp a ${esc(S().tienda.nombre)} para finalizar la compra.</p>
       <p class="form-msg" id="orderMsg" role="alert"></p>
       <div class="co-actions co-actions--final"><button type="button" class="btn btn--ghost" data-co-back>Volver</button><button class="btn" id="placeOrder">Confirmar pedido</button></div>
     </div>${summary}</div>`;
     $("#placeOrder").onclick = placeOrder;
+    $$("[name=bono]").forEach(el => el.onchange = () => { checkout.cupon = el.value || null; renderCheckoutStep(); });
+    if (Store.user && !Loyalty.data && !Loyalty.loading) Loyalty.load().then(() => currentRoute().name === "checkout" && checkout.step === 4 && renderCheckoutStep());
   }
 }
 function goStep(n) { checkout.step = n; renderCheckoutStep(); $("#coRoot")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
@@ -2815,16 +2896,17 @@ async function placeOrder() {
   checkout.busy = true; btn.disabled = true; btn.textContent = "Registrando pedido…"; msg.textContent = "";
   try {
     const items = CartService.detail().map(l => ({ variant_id: l.vid, cantidad: l.qty }));
-    const order = await Api.createOrder(items, checkout.data, checkout.pago);
+    const order = await Api.createOrder(items, { ...checkout.data, cupon: Store.user && checkout.cupon ? checkout.cupon : "" }, checkout.pago);
     try { order.link_token = await rpc("order_link", { p_order_id: order.id }); } catch {}   // si falta la migración 06, el pedido sigue sin enlace
     await PaymentGateway.iniciar(order);
     try { sessionStorage.setItem("lpc_order_" + order.numero, JSON.stringify(order)); } catch {}
-    CartService.clear(); checkout.step = 1; checkout.data = null;
+    CartService.clear(); checkout.step = 1; checkout.data = null; checkout.cupon = null; Loyalty.data = null;
     updateCounts(); renderCart();
     location.hash = "#/pedido/" + encodeURIComponent(order.numero);
     refreshCatalogSoon();
   } catch (e) {
     msg.textContent = friendly(e);
+    if (/CUPON_/.test(e.message)) { checkout.cupon = null; Loyalty.data = null; await Loyalty.load(); renderCheckoutStep(); $("#orderMsg") && ($("#orderMsg").textContent = friendly(e)); return; }
     if (/STOCK_INSUFICIENTE|PRODUCTO_NO_DISPONIBLE|VARIANTE_NO_EXISTE/.test(e.message)) { await Api.loadCatalog().catch(() => {}); CartService.reconcile(); afterCartChange(); $("#orderMsg") && ($("#orderMsg").textContent = friendly(e)); }
     btn.disabled = false; btn.textContent = "Confirmar pedido";
   } finally { checkout.busy = false; }
@@ -2896,6 +2978,8 @@ async function viewOrderDone(numero) {
     <h1 class="h-display">Gracias, ${esc(first)}.</h1>
     <p class="order-no">Pedido ${esc(o.numero)}</p>
     <p>Tu pedido quedó guardado y las unidades reservadas. Para finalizar la compra, envíanos el detalle por WhatsApp.</p>
+    ${o.cliente?.email ? `<p class="muted-text" style="font-size:14px">Cuando confirmemos tu pago te enviaremos la factura a <b>${esc(o.cliente.email)}</b>.</p>` : ""}
+    ${!Store.user && Loyalty.on() ? `<div class="club-inline"><span class="club-inline__ic">${ICON_GIFT}</span><p><b>Suma esta compra a tu bono.</b> Crea tu cuenta con ${o.cliente?.email ? "este mismo correo" : "tu correo"} y cada ${Loyalty.cfg().compras} compras te regalamos ${money(Loyalty.cfg().valor)}.</p><a class="btn btn--sm" href="#/cuenta/registro">Crear cuenta</a></div>` : ""}
     <div class="btns"><a href="${esc(waLink(orderWhatsAppText(o)))}" target="_blank" rel="noopener" class="btn btn--wa" id="openWa">${ICON.wa} Abrir WhatsApp</a></div>
     <div class="order-summary">
       <div class="mini-lines">${(o.items || []).map(i => `<div>${i.imagen ? img(Catalog.imageSm(i.imagen), "") : "<span></span>"}<span>${esc(i.nombre)}<small>Talla ${esc(i.talla)}${i.color ? " · " + esc(i.color) : ""} · ${i.cantidad} × ${i.precio_unitario == null ? "a confirmar" : money(i.precio_unitario)}</small></span><b>${i.subtotal == null ? "—" : money(i.subtotal)}</b></div>`).join("")}</div>
@@ -2990,6 +3074,7 @@ function viewRegister(next) {
     <span class="auth-mark">${brandMark()}</span>
     <h1 class="auth-title">Crear cuenta</h1>
     <p class="auth-sub">Guarda tus direcciones, tus favoritos y el historial de tus pedidos.</p>
+    ${Loyalty.on() ? `<div class="club-inline club-inline--auth"><span class="club-inline__ic">${ICON_GIFT}</span><p><b>Club La Percha:</b> cada ${Loyalty.cfg().compras} compras recibes un bono de ${money(Loyalty.cfg().valor)} para lo que quieras de la tienda.</p></div>` : ""}
     <form id="regForm" class="stack" novalidate data-next="${esc(next || "")}">
       <div class="field"><label for="r_name">Nombre completo</label><input id="r_name" name="nombre" autocomplete="name" required></div>
       <div class="field"><label for="r_email">Correo electrónico</label><input id="r_email" name="email" type="email" autocomplete="email" inputmode="email" required></div>
@@ -3074,6 +3159,7 @@ async function viewAccount(r) {
   let body = "";
   const needOrders = accountTab === "resumen" || accountTab === "pedidos";
   const orders = needOrders ? await Api.myOrders().catch(e => { toast(friendly(e)); return []; }) : [];
+  if (accountTab === "resumen") await Loyalty.load();
   if (["resumen", "direcciones"].includes(accountTab)) await Addresses.list().catch(() => { Store.addresses = Store.addresses || []; });
   const favList = [...Store.favs].map(id => Catalog.byId(id)).filter(p => p && Catalog.isShown(p));
 
@@ -3081,6 +3167,7 @@ async function viewAccount(r) {
     const last = orders[0]; const addr = Addresses.preferred();
     body = `<h2 class="acct-h">Mi cuenta</h2>
       ${!name ? `<div class="acct-note">${uiIcon("info", 18)}<span>Completa tu nombre para personalizar tu cuenta y tus pedidos. <a class="link-btn" href="#/cuenta/datos">Completar datos</a></span></div>` : ""}
+      ${Loyalty.accountHTML()}
       <div class="acct-cards">
         <a class="acct-card" href="#/cuenta/pedidos">${uiIcon("pedidos", 24)}<b>Mis pedidos</b><span>${orders.length ? `${orders.length} pedido${orders.length === 1 ? "" : "s"}` : "Aún no tienes pedidos"}</span>${last ? `<small>Último: ${esc(last.numero)} · ${esc(ORDER_STATUS[last.estado] || last.estado)}</small>` : ""}</a>
         <a class="acct-card" href="#/cuenta/favoritos">${uiIcon("favoritos", 24)}<b>Favoritos</b><span>${favList.length ? `${favList.length} guardado${favList.length === 1 ? "" : "s"}` : "Sin favoritos todavía"}</span></a>
@@ -4699,6 +4786,91 @@ async function resizeImage(file, max) {
   return new Promise(r => c.toBlob(r, "image/jpeg", 0.85));
 }
 /* =========================================================================
+   CLUB LA PERCHA: bono de cliente frecuente (supabase/08_bonos_y_correo_obligatorio.sql)
+   Cada N compras pagadas (por defecto 5) el servidor genera un bono personal con código
+   aleatorio. El cliente lo aplica en el último paso del checkout.
+   ========================================================================= */
+const ICON_GIFT = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="4" rx=".8"/><path d="M5 12.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7.5M12 8.5V21"/><path d="M12 8.5S10.8 4 8.3 4a2.2 2.2 0 0 0 0 4.5H12Zm0 0S13.2 4 15.7 4a2.2 2.2 0 0 1 0 4.5H12Z"/></svg>';
+const Loyalty = {
+  data: null, loading: null,
+  cfg() { const f = S().fidelidad || {}; return { activo: f.activo !== false, compras: Number(f.compras) || 5, valor: Number(f.valor) || 20000 }; },
+  on() { return this.cfg().activo; },
+  async load() {
+    if (!Store.user) return (this.data = null);
+    if (this.loading) return this.loading;
+    this.loading = rpc("my_loyalty").then(d => (this.data = d), () => (this.data = null)).finally(() => { this.loading = null; });
+    return this.loading;
+  },
+  available() { return (this.data?.cupones || []).filter(c => !c.usado); },
+  selected() { return Store.user && checkout.cupon ? this.available().find(c => c.codigo === checkout.cupon) || null : null; },
+  applyTo(t) {
+    const c = this.selected(); if (!c || !t.subtotal) return t;
+    const descuento = Math.min(t.subtotal, c.tipo === "porcentaje" ? Math.round(t.subtotal * c.valor / 100) : Number(c.valor));
+    return { ...t, descuento, cupon: c.codigo, total: t.total - descuento };
+  },
+  dots(n, meta) { return `<span class="club-dots" aria-hidden="true">${Array.from({ length: meta }, (_, i) => `<i class="${i < n ? "on" : ""}">${i === meta - 1 ? ICON_GIFT : ""}</i>`).join("")}</span>`; },
+  checkoutHTML() {
+    if (!this.on()) return "";
+    const cfg = this.cfg();
+    if (!Store.user) return `<section class="club-co"><h3>Bono de cliente frecuente</h3><p>Crea tu cuenta gratis y gana un bono de <b>${money(cfg.valor)}</b> cada ${cfg.compras} compras. <a class="link-btn" href="#/cuenta/registro?next=checkout">Crear cuenta</a></p></section>`;
+    if (!this.data) return `<section class="club-co"><h3>Tus bonos</h3><p class="muted-text">Cargando…</p></section>`;
+    const av = this.available();
+    if (!av.length) { const d = this.data; return `<section class="club-co"><h3>Tus bonos</h3>${this.dots(d.progreso, d.meta)}<p>Llevas <b>${d.progreso} de ${d.meta}</b> compras pagadas. Al completar ${d.meta} recibes un bono de <b>${money(d.valor)}</b>.</p></section>`; }
+    return `<section class="club-co"><h3>Usa tu bono</h3><div class="pay club-pick" role="radiogroup" aria-label="Bonos disponibles">
+      ${av.map(c => `<label><input type="radio" name="bono" value="${esc(c.codigo)}" ${checkout.cupon === c.codigo ? "checked" : ""}><span><b>Bono ${money(c.valor)}</b><small>Código ${esc(c.codigo)}</small></span><span></span></label>`).join("")}
+      <label><input type="radio" name="bono" value="" ${checkout.cupon ? "" : "checked"}><span><b>No usar bono ahora</b><small>Guárdalo para otra compra</small></span><span></span></label></div></section>`;
+  },
+  accountHTML() {
+    if (!this.on() || !this.data) return "";
+    const d = this.data, av = this.available(), used = (d.cupones || []).filter(c => c.usado);
+    const falta = d.meta - d.progreso;
+    return `<section class="club-card">
+      <div class="club-card__head"><span class="club-card__ic">${ICON_GIFT}</span><div><p class="club-card__eyebrow">Club La Percha</p>
+        <h3>${av.length ? `Tienes ${av.length === 1 ? "un bono" : av.length + " bonos"} de ${money(d.valor)}` : `Te ${falta === 1 ? "falta 1 compra" : "faltan " + falta + " compras"} para tu bono`}</h3></div></div>
+      ${this.dots(d.progreso, d.meta)}
+      <p class="club-card__txt">Cada ${d.meta} compras pagadas te regalamos un bono de <b>${money(d.valor)}</b> para cualquier producto. Llevas <b>${d.progreso} de ${d.meta}</b>${d.compras > d.progreso ? ` · ${d.compras} compras en total` : ""}.</p>
+      ${av.length ? `<div class="club-codes">${av.map(c => `<div class="club-code"><span>Código</span><b>${esc(c.codigo)}</b><small>${money(c.valor)} · úsalo al finalizar tu compra</small></div>`).join("")}</div><a class="btn btn--sm" href="#/tienda">Usar mi bono</a>` : ""}
+      ${used.length ? `<p class="club-card__used">Bonos usados: ${used.map(c => `${esc(c.codigo)}${c.pedido ? " (pedido " + esc(c.pedido) + ")" : ""}`).join(" · ")}</p>` : ""}
+    </section>`;
+  }
+};
+
+/* Aviso flotante para invitados: invita a crear cuenta. Se minimiza a un botón pequeño. */
+const ClubPromo = {
+  el: null, timer: null,
+  hidden() { const r = currentRoute().name; return !Store.ready || !!Store.user || !Loyalty.on() || ["cuenta", "checkout", "admin", "p"].includes(r); },
+  build() {
+    const cfg = Loyalty.cfg();
+    const el = document.createElement("aside");
+    el.className = "club-promo"; el.setAttribute("aria-label", "Club La Percha");
+    el.innerHTML = `<div class="club-promo__card" role="dialog" aria-labelledby="clubT">
+        <button type="button" class="club-promo__x" data-club-min aria-label="Minimizar">✕</button>
+        <div class="club-promo__top"><span class="club-promo__ic">${ICON_GIFT}</span><p class="club-promo__eyebrow">Club La Percha</p></div>
+        <h2 id="clubT" class="club-promo__title">Gana <em>${money(cfg.valor)}</em> en tus compras</h2>
+        <p class="club-promo__txt">Crea tu cuenta gratis. Por cada ${cfg.compras} compras te regalamos un bono de ${money(cfg.valor)} para lo que quieras de la tienda.</p>
+        ${Loyalty.dots(cfg.compras - 1, cfg.compras)}
+        <div class="club-promo__btns"><a href="#/cuenta/registro" class="club-promo__cta">Crear mi cuenta</a><a href="#/cuenta" class="club-promo__link">Ya tengo cuenta</a></div>
+      </div>
+      <button type="button" class="club-promo__pill" data-club-open aria-label="Ver beneficio: bono de ${money(cfg.valor)}">${ICON_GIFT}<span>Bono ${money(cfg.valor)}</span></button>`;
+    el.addEventListener("click", e => {
+      if (e.target.closest("[data-club-min]")) { this.set("min"); Local.set("clubMin", Date.now()); }
+      else if (e.target.closest("[data-club-open]")) this.set("open");
+      else if (e.target.closest("a")) this.set("min");
+    });
+    document.body.appendChild(el); this.el = el;
+  },
+  set(state) { if (!this.el) return; this.el.dataset.state = state; },
+  update() {
+    if (this.hidden()) { if (this.el) this.set("off"); clearTimeout(this.timer); return; }
+    if (!this.el) this.build();
+    if (this.el.dataset.state === "open" || this.el.dataset.state === "min") return;
+    const recent = Date.now() - Number(Local.get("clubMin", 0)) < 3 * 864e5;   // minimizado hace menos de 3 días
+    this.set("min");
+    if (!recent) { clearTimeout(this.timer); this.timer = setTimeout(() => !this.hidden() && this.el.dataset.state === "min" && this.set("open"), 6000); }
+  }
+};
+
+/* =========================================================================
    PAGO DE PEDIDOS ONLINE: formulario (comprobante opcional + nota) y correo
    "¡Gracias por tu compra!" al cliente (Edge Function enviar-correo-pedido)
    ========================================================================= */
@@ -5042,7 +5214,7 @@ async function render() {
   document.title = `${S().tienda.nombre} — ${pt || (Store.ready ? "Página no encontrada" : "Tienda online")}`;
   $$("[data-nav]").forEach(a => { const on = a.dataset.nav === r.name || (r.name === "categoria" && a.dataset.nav === Catalog.category(r.param)?.grupo); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
   if (changed) { scrollTo({ top: 0, behavior: "instant" }); if (r.name !== "home") app.focus({ preventScroll: true }); } else scrollTo({ top: y, behavior: "instant" });
-  onScroll(); reveal();
+  onScroll(); reveal(); ClubPromo.update();
 }
 /* mountHome: ver portada */
 const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px", threshold: .08 }) : null;
@@ -5202,8 +5374,10 @@ async function onSession(session, event) {
   await Api.loadFavs().catch(() => {});
   if (Store.user) Addresses.list().catch(() => { Store.addresses = []; }); else Store.addresses = [];
   if (!Store.user) { AdminData.loaded = false; if (Store.productsAreAdmin) await Api.loadCatalog().catch(() => {}); }
+  Loyalty.data = null; if (!Store.user) checkout.cupon = null;
   updateCounts();
   subscribeRealtime();
+  ClubPromo.update();
   if (event === "PASSWORD_RECOVERY") { Recovery.start(); location.hash = "#/cuenta/nueva-clave"; }
 }
 
