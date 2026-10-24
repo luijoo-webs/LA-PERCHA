@@ -1660,14 +1660,31 @@ body.is-admin .club-promo{display:none}
 .promo-note{margin:6px 0 0;font-size:13px;padding:8px 12px;background:rgba(201,162,78,.12);border-left:3px solid #c9a24e}
 .policy-sign{margin:28px 0 0;font-size:12px;letter-spacing:.22em;font-weight:700;color:#a8832f}
 @media (max-width:480px){.coupon-form{flex-wrap:wrap}.coupon-form .btn{width:100%}}
+
+/* ---------- Legal ---------- */
+.consents{display:grid;gap:10px;margin:18px 0 4px;padding:14px 16px;border:1px solid var(--line);background:rgba(201,162,78,.06)}
+.consents .check-row{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.5;margin:0}
+.consents input{margin-top:3px;flex:none;width:18px;height:18px;accent-color:#111}
+.consents a,.cookie-bar a{color:#1a56db;text-decoration:underline;text-underline-offset:2px}
+body.theme-dark .consents a,body.theme-dark .cookie-bar a{color:#7aa7ff}
+.policy-nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}
+.policy-nav a{padding:8px 14px;border:1px solid var(--line);font-size:12px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:inherit}
+.policy-nav a:hover{border-color:#c9a24e}
+.policy h3{font-size:14px;margin:18px 0 6px;text-transform:none;letter-spacing:0}
+.cookie-bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:75;max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 16px;background:#0f0f0f;color:#f3efe6;border-top:3px solid #c9a24e;box-shadow:0 16px 40px rgba(0,0,0,.3);font-size:13px;line-height:1.5}
+.cookie-bar p{margin:0;flex:1}
+.cookie-bar a{color:#e2c477}
+.cookie-bar .btn{flex:none;background:#c9a24e;color:#111;border-color:#c9a24e}
+body.is-admin .cookie-bar{display:none}
+@media (max-width:560px){.cookie-bar{flex-direction:column;align-items:stretch;bottom:calc(80px + env(safe-area-inset-bottom))}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 </head>
 <body class="theme-light">
 <a href="#app" class="skip">Saltar al contenido</a>
 <div class="announce" aria-label="Información de la tienda"><div class="announce__track">
-  <span>Envíos a toda Colombia</span><span>5 días para cambios</span><span>Paga con Nequi, Daviplata o Bancolombia</span><span>Tienda física en Valledupar</span><span>Confirmamos tu pedido por WhatsApp</span>
-  <span aria-hidden="true">Envíos a toda Colombia</span><span aria-hidden="true">5 días para cambios</span><span aria-hidden="true">Paga con Nequi, Daviplata o Bancolombia</span><span aria-hidden="true">Tienda física en Valledupar</span><span aria-hidden="true">Confirmamos tu pedido por WhatsApp</span>
+  <span>Envíos a toda Colombia</span><span>Bono de $20.000 cada 5 compras</span><span>Paga con Nequi, Llave o Bancolombia</span><span>Tienda física en Valledupar</span><span>Confirmamos tu pedido por WhatsApp</span>
+  <span aria-hidden="true">Envíos a toda Colombia</span><span aria-hidden="true">Bono de $20.000 cada 5 compras</span><span aria-hidden="true">Paga con Nequi, Llave o Bancolombia</span><span aria-hidden="true">Tienda física en Valledupar</span><span aria-hidden="true">Confirmamos tu pedido por WhatsApp</span>
 </div></div>
 
 <!-- ===================== NAV ===================== -->
@@ -1740,8 +1757,12 @@ body.is-admin .club-promo{display:none}
         <ul>
           <li><a href="#" data-whatsapp>Escríbenos por WhatsApp</a></li>
           <li><a href="#/cuenta">Mi cuenta y pedidos</a></li>
-          <li><a href="#/politicas">Envíos y cambios</a></li>
-          <li><a href="#/politicas#privacidad">Privacidad de datos</a></li>
+          <li><a href="#/politicas#terminos">Términos y condiciones</a></li>
+          <li><a href="#/politicas#privacidad">Política de privacidad</a></li>
+          <li><a href="#/politicas#cookies">Política de cookies</a></li>
+          <li><a href="#/politicas#cambios">Cambios y reembolsos</a></li>
+          <li><a href="#/politicas#envios">Envíos</a></li>
+          <li><a href="https://www.sic.gov.co" target="_blank" rel="noopener">Superintendencia de Industria y Comercio</a></li>
         </ul>
       </div>
       <div><h5>Síguenos</h5><ul><li><a href="#" data-instagram target="_blank" rel="noopener">Instagram</a></li><li><a href="#" data-tiktok target="_blank" rel="noopener">TikTok</a></li><li><a href="#" data-facebook target="_blank" rel="noopener">Facebook</a></li><li><a href="#" data-whatsapp>WhatsApp</a></li></ul></div>
@@ -1861,10 +1882,10 @@ const DEFAULT_SETTINGS = {
   fidelidad: { activo: true, compras: 5, valor: 20000 },
   catalogo: { permitirSinPrecio: true, porPagina: 24 },
   pagos: {
-    contraentrega: { activo: true, nombre: "Pago contra entrega", descripcion: "Pagas en efectivo al recibir tu pedido (según cobertura de la transportadora)." },
+    contraentrega: { activo: true, nombre: "Pago contra entrega (solo Valledupar)", descripcion: "Disponible solo para entregas en Valledupar: pagas en efectivo cuando recibes tu pedido." },
     efectivo: { activo: true, nombre: "Efectivo en tienda", descripcion: "Recoges y pagas en nuestra tienda en Valledupar." },
     nequi: { activo: true, nombre: "Nequi", descripcion: "Te enviamos los datos de Nequi por WhatsApp al confirmar el pedido." },
-    daviplata: { activo: true, nombre: "Daviplata", descripcion: "Te enviamos los datos de Daviplata por WhatsApp al confirmar el pedido." },
+    daviplata: { activo: true, nombre: "Llave Bre-B", descripcion: "Pagas desde la app de tu banco o billetera con nuestra llave. Te la enviamos por WhatsApp al confirmar el pedido." },
     bancolombia: { activo: true, nombre: "Transferencia Bancolombia", descripcion: "Te enviamos los datos de la cuenta Bancolombia por WhatsApp al confirmar el pedido." },
     addi: { activo: false, nombre: "Addi — paga a cuotas", descripcion: "Compra ahora y paga a cuotas con Addi. Te enviamos el enlace de pago por WhatsApp.",
             widgetSlug: "", widgetScript: "https://s3.amazonaws.com/widgets.addi.com/bundle.min.js" }
@@ -1884,10 +1905,10 @@ const DEFAULT_SETTINGS = {
    coordina por WhatsApp (no hay pasarela online en el alcance de esta tienda).
    Addi viene listo pero desactivado: se activa en Admin → Configuración. */
 const PAYMENT_PROVIDERS = {
-  contraentrega: { integrado: true, nombre: "Pago contra entrega" },
+  contraentrega: { integrado: true, nombre: "Pago contra entrega (solo Valledupar)" },
   efectivo:      { integrado: true, nombre: "Efectivo en tienda" },
   nequi:         { integrado: true, nombre: "Nequi" },
-  daviplata:     { integrado: true, nombre: "Daviplata" },
+  daviplata:     { integrado: true, nombre: "Llave Bre-B" },   // shortcut: el id interno sigue siendo "daviplata" (restricciones de la BD); solo cambia el nombre
   bancolombia:   { integrado: true, nombre: "Transferencia Bancolombia" },
   addi:          { integrado: true, nombre: "Addi — paga a cuotas" }
 };
@@ -1908,6 +1929,8 @@ const CATALOG_SEED_URL = "img/catalogo/catalogo.json";   // catálogo de La Perc
 const Store = { addresses: [], ready: false, error: null, settings: structuredClone(DEFAULT_SETTINGS), categories: [], products: [], user: null, profile: null, favs: new Set() };
 
 const ERR = {
+  CONSENTIMIENTO_REQUERIDO: "Debes aceptar los Términos y condiciones y la Política de privacidad para continuar.",
+  CONTRAENTREGA_SOLO_VALLEDUPAR: "El pago contra entrega solo está disponible para entregas en Valledupar. Elige otro método de pago.",
   EMAIL_REQUERIDO: "Escribe un correo electrónico válido: allí te enviamos la factura.",
   CUPON_INVALIDO: "Ese cupón no existe o no está disponible para tu cuenta. Revisa el código.",
   CUPON_USADO: "Ese cupón ya fue usado. Cada cupón sirve una sola vez.",
@@ -2528,12 +2551,30 @@ document.addEventListener("click", e => {
 });
 
 /* ---------- Políticas (envíos, cambios, garantía y datos) — texto base para revisión del cliente ---------- */
+/* Identificación del vendedor (art. 50 Ley 1480): sale de Configuración → Facturación */
+const legalName = () => S().facturacion?.razonSocial || S().tienda.nombre;
+const legalNit = () => S().facturacion?.nit ? ` · NIT ${S().facturacion.nit}${S().facturacion.dv ? "-" + S().facturacion.dv : ""}` : "";
+const legalMail = () => S().tienda.correo || S().facturacion?.correo || "laperchavup@gmail.com";
+const legalPhone = () => S().facturacion?.telefono || "314 454 3114";
 function viewPolicies() {
-  const t = S().tienda, pd = S().pedidos;
+  const t = S().tienda;
   const sec = (id, title, body) => `<section class="policy" id="${id}"><h2>${title}</h2>${body}</section>`;
   return `<section class="page wrap">${crumbs([{ label: "Inicio", href: "#/" }, { label: "Políticas" }])}
-    <h1 class="h-display page-title">Políticas</h1><p class="page-sub">Cambios, envíos, garantía y tratamiento de datos de ${esc(t.nombre)}.</p>
+    <h1 class="h-display page-title">Políticas</h1><p class="page-sub">Términos, privacidad, cookies, cambios, reembolsos, envíos y garantía de ${esc(t.nombre)}.</p>
+    <nav class="policy-nav" aria-label="Documentos">${[["terminos", "Términos y condiciones"], ["privacidad", "Privacidad"], ["cookies", "Cookies"], ["cambios", "Cambios"], ["reembolsos", "Reembolsos"], ["envios", "Envíos"], ["retracto", "Retracto"], ["garantia", "Garantía"]].map(([id, l]) => `<a href="#/politicas#${id}">${l}</a>`).join("")}</nav>
     <div class="policies">
+    ${sec("terminos", "Términos y condiciones", `<p>Estos términos regulan el uso de esta página y las compras en ${esc(t.nombre)}. Al crear una cuenta o hacer un pedido los aceptas expresamente.</p>
+      <h3>1. Quiénes somos</h3><p>${esc(legalName())}${legalNit()}, tienda de ropa, calzado y accesorios ubicada en ${esc(t.direccion)}. Contacto: WhatsApp ${esc(legalPhone())} · ${esc(legalMail())}.</p>
+      <h3>2. Cuenta</h3><p>Para comprar debes ser mayor de edad o contar con la autorización de tu representante legal. Eres responsable de la información que registras y de mantener segura tu contraseña.</p>
+      <h3>3. Productos y precios</h3><p>Las fotos buscan mostrar el producto con la mayor fidelidad posible; el color puede variar según tu pantalla. Los precios están en pesos colombianos e incluyen los impuestos aplicables. El costo del envío se informa y se confirma contigo por WhatsApp <b>antes</b> de que pagues. Si un producto aparece "a confirmar", te informamos su precio antes del pago. Todos los productos están sujetos a disponibilidad.</p>
+      <h3>4. Cómo compras</h3><p>Eliges los productos, registras tus datos de entrega, aceptas estos términos y la política de privacidad y confirmas el pedido. Recibes un número de pedido y el pedido queda "Pendiente de pago". La compra se perfecciona cuando confirmamos contigo el total por WhatsApp y registramos tu pago; entonces te enviamos el comprobante a tu correo. Si después de tu pago no podemos despachar, te devolvemos el dinero.</p>
+      <h3>5. Medios de pago</h3><p>Nequi, Llave Bre-B, transferencia Bancolombia, efectivo en tienda y pago contra entrega (este último solo para entregas en Valledupar). No recibimos datos de tarjetas en esta página.</p>
+      <h3>6. Cupones y bonos</h3><p>Los cupones del Club La Percha (un bono de ${money(Loyalty.cfg().valor)} cada ${Loyalty.cfg().compras} compras pagadas) y los demás cupones son personales, sirven una sola vez, vencen a los 3 meses de creados, no son canjeables por dinero y se aplican solo con la sesión iniciada. Si se cancela el pedido donde se usó, el cupón vuelve a quedar disponible mientras esté vigente.</p>
+      <h3>7. Envíos, cambios, reembolsos y garantía</h3><p>Se rigen por las secciones de esta página: <a class="link-btn" href="#/politicas#envios">Envíos</a>, <a class="link-btn" href="#/politicas#cambios">Cambios</a>, <a class="link-btn" href="#/politicas#reembolsos">Reembolsos</a>, <a class="link-btn" href="#/politicas#retracto">Retracto</a> y <a class="link-btn" href="#/politicas#garantia">Garantía</a>.</p>
+      <h3>8. Facturación</h3><p>Con tu compra recibes un comprobante. Si necesitas factura electrónica con tus datos, solicítala por WhatsApp.</p>
+      <h3>9. Peticiones, quejas y reclamos</h3><p>Atiéndelas por WhatsApp o al correo ${esc(legalMail())}; respondemos dentro de los 15 días hábiles siguientes. También puedes acudir a la Superintendencia de Industria y Comercio (<a class="link-btn" href="https://www.sic.gov.co" target="_blank" rel="noopener">www.sic.gov.co</a>).</p>
+      <h3>10. Ley aplicable</h3><p>Estos términos se rigen por las leyes de Colombia, en especial la Ley 1480 de 2011 (Estatuto del Consumidor), la Ley 527 de 1999 (comercio electrónico) y la Ley 1581 de 2012 (datos personales). Nada aquí limita tus derechos como consumidor.</p>
+      <p class="muted-text">Vigentes desde el 24 de octubre de 2026 (versión ${LEGAL_VERSION}).</p>`)}
     ${sec("cambios", "Cambios y devoluciones", `<p>En ${esc(t.nombre)}, tu estilo es nuestra prioridad.</p>
       <ul><li><b>No hacemos devoluciones de dinero</b> por cambios de opinión, talla, color o gusto personal.</li>
       <li>Los cambios de prendas están sujetos a nuestras condiciones y a la disponibilidad de inventario.</li>
@@ -2546,9 +2587,28 @@ function viewPolicies() {
       <li><b>Nos hacemos responsables hasta la entrega de la guía de envío.</b> A partir de ese momento, la responsabilidad del paquete recae sobre la transportadora seleccionada por el cliente.</li>
       <li>No nos hacemos responsables por pérdidas ni incautaciones. Cualquier inconveniente posterior a la entrega de la guía debe gestionarse directamente con la empresa de transporte elegida.</li>
       <li>En Valledupar también puedes recoger tu pedido en la tienda: ${esc(t.direccion)}.</li></ul>`)}
-    ${sec("retracto", "Derecho de retracto", `<p>En compras a distancia (página web o WhatsApp), conforme al artículo 47 de la Ley 1480 de 2011 (Estatuto del Consumidor), puedes retractarte dentro de los 5 días hábiles siguientes a la entrega, devolviendo el producto en las mismas condiciones en que lo recibiste. Los costos de transporte de la devolución corren por tu cuenta y el dinero se reintegra dentro de los 30 días calendario siguientes. Aplican las excepciones previstas en la ley.</p>`)}
-    ${sec("garantia", "Garantía", `<p>Si tu producto presenta un defecto, escríbenos por WhatsApp con tu número de pedido y fotos del producto. Revisamos cada caso y, según corresponda, cambiamos el producto, lo reparamos o devolvemos el dinero, de acuerdo con la garantía legal vigente en Colombia.</p>`)}
-    ${sec("privacidad", "Tratamiento de datos personales", `<p>Los datos que registras (nombre, teléfono, correo y dirección) se usan únicamente para gestionar tus pedidos, entregas, cuenta y comunicaciones sobre tus compras, conforme a la Ley 1581 de 2012. No los vendemos ni los compartimos, salvo con la transportadora para realizar la entrega. Puedes consultar, actualizar o pedir la eliminación de tus datos escribiéndonos por WhatsApp${t.correo ? " o al correo " + esc(t.correo) : ""}.</p>`)}
+    ${sec("reembolsos", "Política de reembolsos", `<p>No hacemos devoluciones de dinero por cambio de opinión, talla, color o gusto personal; en esos casos aplica la política de cambios. <b>Sí devolvemos el dinero</b> en estos casos:</p>
+      <ul><li><b>Derecho de retracto</b> (ver abajo): dentro de los 5 días hábiles siguientes a la entrega. Reintegramos el valor pagado dentro de los 30 días calendario siguientes a la solicitud.</li>
+      <li><b>Reversión del pago</b> (art. 51 de la Ley 1480 de 2011 y Decreto 587 de 2016), si pagaste con un medio electrónico y fuiste víctima de fraude, la operación no fue solicitada, no recibiste el producto o el producto es defectuoso o no corresponde a lo pedido. Debes pedirla dentro de los 5 días hábiles siguientes a conocer el hecho, a nosotros y a la entidad emisora de tu medio de pago, y devolver el producto si lo recibiste.</li>
+      <li><b>Garantía</b>: cuando un producto defectuoso no pueda repararse ni cambiarse por uno igual.</li>
+      <li><b>Pedido no despachado</b>: si ya pagaste y no tenemos el producto o cancelamos el pedido.</li>
+      <li><b>Cobros errados o duplicados.</b></li></ul>
+      <p>El reembolso se hace por el mismo medio de pago o por transferencia a una cuenta a nombre del comprador. Para solicitarlo escríbenos por WhatsApp o al correo ${esc(legalMail())} con tu número de pedido.</p>`)}
+    ${sec("retracto", "Derecho de retracto", `<p>En compras a distancia (página web o WhatsApp), conforme al artículo 47 de la Ley 1480 de 2011 (Estatuto del Consumidor), puedes retractarte dentro de los 5 días hábiles siguientes a la entrega, devolviendo el producto sin uso y en las mismas condiciones en que lo recibiste. Los costos de transporte de la devolución corren por tu cuenta y el dinero se reintegra dentro de los 30 días calendario siguientes. No aplica a las excepciones previstas en la ley (por ejemplo, prendas de uso personal íntimo o productos hechos a la medida).</p>`)}
+    ${sec("garantia", "Garantía", `<p>Todos nuestros productos tienen la garantía legal de calidad e idoneidad del Estatuto del Consumidor (Ley 1480 de 2011). Si tu producto presenta un defecto, escríbenos por WhatsApp con tu número de pedido y fotos. Revisamos cada caso y, según corresponda, lo reparamos, lo cambiamos o devolvemos el dinero. La garantía no cubre el desgaste normal ni los daños por mal uso, lavado inadecuado o modificaciones.</p>`)}
+    ${sec("privacidad", "Política de privacidad y tratamiento de datos personales", `<p>En cumplimiento de la Ley 1581 de 2012 y el Decreto 1074 de 2015 (que incorpora el Decreto 1377 de 2013), ${esc(legalName())} informa cómo trata tus datos personales.</p>
+      <h3>Responsable</h3><p>${esc(legalName())}${legalNit()} · ${esc(t.direccion)} · WhatsApp ${esc(legalPhone())} · ${esc(legalMail())}.</p>
+      <h3>Datos que recolectamos</h3><p>Nombre, teléfono, correo, ciudad, barrio y dirección de entrega, historial de pedidos, favoritos y, si creas una cuenta, tu contraseña (cifrada; nunca la vemos). No recolectamos datos sensibles ni datos de tarjetas: los pagos se hacen fuera de la página.</p>
+      <h3>Finalidades</h3><ul><li>Gestionar tus pedidos, pagos, entregas, cambios, garantías y facturación.</li><li>Crear y administrar tu cuenta, tus direcciones y tus cupones del Club La Percha.</li><li>Enviarte por correo o WhatsApp información sobre tus compras.</li><li>Enviarte novedades y promociones solo si lo autorizas en "Mi cuenta → Configuración"; puedes retirarte cuando quieras. Respetamos los horarios de la Ley 2300 de 2023.</li><li>Cumplir obligaciones legales, contables y tributarias, y atender requerimientos de autoridades.</li></ul>
+      <h3>Con quién los compartimos</h3><p>No vendemos tus datos. Los compartimos solo con los proveedores necesarios para operar, que actúan como encargados: la transportadora que entrega tu pedido, nuestro proveedor de base de datos y alojamiento (Supabase, con servidores fuera de Colombia, lo que implica una transferencia internacional de datos que autorizas al aceptar esta política), Google (envío de correos) y WhatsApp (Meta) cuando nos escribes.</p>
+      <h3>Tus derechos</h3><p>Como titular puedes conocer, actualizar y rectificar tus datos; pedir prueba de tu autorización; ser informado sobre su uso; revocar la autorización o pedir que los eliminemos (cuando no exista un deber legal de conservarlos); acceder gratis a ellos y presentar quejas ante la Superintendencia de Industria y Comercio (SIC).</p>
+      <h3>Cómo ejercerlos</h3><p>Escríbenos a ${esc(legalMail())} o por WhatsApp. Respondemos consultas en máximo 10 días hábiles (prorrogables 5) y reclamos en máximo 15 días hábiles (prorrogables 8), según los artículos 14 y 15 de la Ley 1581 de 2012. Desde "Mi cuenta" también puedes actualizar tus datos.</p>
+      <h3>Seguridad y conservación</h3><p>Usamos conexión cifrada (HTTPS), acceso restringido por roles y contraseñas cifradas. Conservamos los datos mientras tengas una relación con nosotros y por el tiempo que exijan las normas contables y tributarias. Registramos la fecha, hora, IP y versión del documento cada vez que aceptas esta política, como prueba de tu autorización.</p>
+      <p class="muted-text">Vigente desde el 24 de octubre de 2026 (versión ${LEGAL_VERSION}).</p>`)}
+    ${sec("cookies", "Política de cookies", `<p>Esta página <b>no usa cookies de publicidad ni de analítica</b>. Usamos solo almacenamiento técnico del navegador (localStorage), necesario para que la tienda funcione:</p>
+      <ul><li><b>Sesión</b>: mantener abierta tu cuenta.</li><li><b>Carrito y favoritos</b>: recordar lo que agregaste aunque no tengas cuenta.</li><li><b>Preferencias</b>: recordar que ya viste este aviso o el del Club La Percha.</li></ul>
+      <p>Servicios de terceros: las fuentes tipográficas se cargan desde Google Fonts y el mapa de la tienda es de Google Maps, que puede usar sus propias cookies según la <a class="link-btn" href="https://policies.google.com/privacy" target="_blank" rel="noopener">política de Google</a>.</p>
+      <p>Como solo usamos almacenamiento técnico, no necesitamos pedirte permiso para usarlo; te lo informamos con el aviso de la parte inferior. Puedes borrarlo desde la configuración de tu navegador (la tienda olvidará tu carrito y cerrará tu sesión). Si en el futuro usamos cookies de analítica o publicidad, te pediremos autorización antes de activarlas.</p>`)}
     </div>
     <p class="policy-sign">${esc(t.nombre).toUpperCase()} · Estilo urbano · Actitud · Exclusividad 💎</p>
     <p class="muted-text" style="font-size:12.5px;margin-top:24px">Si tienes dudas, escríbenos por <a class="link-btn" href="${esc(waLink())}" target="_blank" rel="noopener">WhatsApp</a>.</p>
@@ -2842,6 +2902,12 @@ function afterCartChange() { updateCounts(); renderCart(); if (currentRoute().na
    ========================================================================= */
 const checkout = { step: 1, data: null, pago: null, busy: false, cupon: null };   // cupon: { codigo, tipo, valor, termina } validado en el servidor
 const STEPS = ["Carrito", "Datos de envío", "Método de pago", "Confirmación"];
+/* Versión de los documentos legales (#/politicas). Cambiarla cuando se modifique el texto: queda en cada registro de aceptación. */
+const LEGAL_VERSION = "2026-10-24";
+const consentHTML = (on = false) => `<div class="consents">
+  <label class="check-row"><input type="checkbox" name="acepta_terminos" ${on ? "checked" : ""} required> <span>He leído y acepto los <a href="#/politicas#terminos" target="_blank" rel="noopener">Términos y condiciones</a>.</span></label>
+  <label class="check-row"><input type="checkbox" name="acepta_privacidad" ${on ? "checked" : ""} required> <span>Autorizo el tratamiento de mis datos personales según la <a href="#/politicas#privacidad" target="_blank" rel="noopener">Política de privacidad</a>.</span></label>
+</div>`;
 const SHIP_FIELDS = [
   { id: "nombre", label: "Nombre completo", req: true, auto: "name" },
   { id: "telefono", label: "Número de teléfono", req: true, auto: "tel", type: "tel", hint: "Celular de contacto para coordinar la entrega." },
@@ -2883,6 +2949,7 @@ function renderCheckoutStep() {
           ${f.area ? `<textarea id="f_${f.id}" name="${f.id}">${esc(base[f.id] || "")}</textarea>` : `<input id="f_${f.id}" name="${f.id}" type="${f.type || "text"}" ${f.auto ? `autocomplete="${f.auto}"` : ""} ${f.req ? "required" : ""} value="${esc(base[f.id] || "")}" ${f.type === "tel" ? 'inputmode="tel"' : ""} aria-describedby="e_${f.id}${f.hint ? " h_" + f.id : ""}">`}
           ${f.hint ? `<span class="hint" id="h_${f.id}">${f.hint}</span>` : ""}<span class="err" id="e_${f.id}">${f.id === "telefono" ? "Ingresa un número válido (mínimo 7 dígitos)." : f.id === "email" ? "Escribe un correo válido (ej.: nombre@gmail.com)." : "Campo obligatorio."}</span></div>`).join("")}
       </div>${Store.user ? `<label class="check-row"><input type="checkbox" name="guardar" ${addrs.length ? "" : "checked"}> Guardar esta dirección en mi cuenta</label>` : ""}</fieldset>
+      ${consentHTML(!!checkout.data?.acepta_terminos)}
       <div class="co-actions"><button type="button" class="btn btn--ghost" data-co-back>Volver</button><button class="btn" type="submit">Continuar al pago</button></div>
     </form>${summary}</div>`;
     const form = $("#shipForm");
@@ -2901,7 +2968,8 @@ function renderCheckoutStep() {
       const bad = $$("input:not([type=checkbox]):not([type=radio])", form).filter(el => !validate(el));
       if (bad.length) { bad[0].focus(); toast("Revisa los campos marcados."); return; }
       const fd = Object.fromEntries(new FormData(form));
-      checkout.data = Object.fromEntries(SHIP_FIELDS.map(f => [f.id, String(fd[f.id] ?? "").trim()]));
+      if (!fd.acepta_terminos || !fd.acepta_privacidad) { $("[name=" + (fd.acepta_terminos ? "acepta_privacidad" : "acepta_terminos") + "]", form).focus(); toast(ERR.CONSENTIMIENTO_REQUERIDO); return; }
+      checkout.data = { ...Object.fromEntries(SHIP_FIELDS.map(f => [f.id, String(fd[f.id] ?? "").trim()])), acepta_terminos: true, acepta_privacidad: true, version_legal: LEGAL_VERSION, url: location.href.slice(0, 300) };
       if (Store.user) checkout.data.email = Store.user.email;
       if (Store.user && fd.guardar) { const d = checkout.data;
         Addresses.save({ destinatario: d.nombre, telefono: d.telefono, ciudad: d.ciudad, direccion: d.direccion, barrio: d.barrio, info_adicional: d.info_adicional, etiqueta: "", predeterminada: !(Store.addresses || []).length }).catch(() => {}); }
@@ -2909,7 +2977,8 @@ function renderCheckoutStep() {
       goStep(3);
     };
   } else if (checkout.step === 3) {
-    const methods = PaymentGateway.available();
+    const enVup = /valledupar/.test(norm(checkout.data?.ciudad));
+    const methods = PaymentGateway.available().filter(m => m.id !== "contraentrega" || enVup);
     if (!checkout.pago || !methods.find(m => m.id === checkout.pago)) checkout.pago = methods[0]?.id || null;
     box.innerHTML = `<div class="co"><form id="payForm"><fieldset><legend><h2><span>3</span>Método de pago</h2></legend>
       ${methods.length ? `<div class="pay" role="radiogroup" aria-label="Método de pago">${methods.map(m => `<label><input type="radio" name="pay" value="${m.id}" ${checkout.pago === m.id ? "checked" : ""}><span><b>${esc(m.nombre)}</b><small>${esc(m.descripcion)}</small></span><span></span></label>`).join("")}</div>` : `<p>No hay métodos de pago activos. Escríbenos por WhatsApp para completar tu pedido.</p>`}
@@ -3124,6 +3193,7 @@ function viewRegister(next) {
       ${pwField("r_pw", "password", "Contraseña", "new-password", 'minlength="8"')}
       ${pwField("r_pw2", "password2", "Confirmar contraseña", "new-password")}
       <span class="hint">Mínimo 8 caracteres.</span>
+      ${consentHTML()}
       <p class="form-msg" id="regMsg" role="alert"></p>
       <button class="btn btn--block" type="submit">Crear cuenta</button>
     </form>
@@ -3333,8 +3403,12 @@ function mountAccount() {
     if (!/^\S+@\S+\.\S+$/.test(f.email.trim())) return msg("regMsg", "Escribe un correo válido.");
     if (f.password.length < 8) return msg("regMsg", "La contraseña debe tener al menos 8 caracteres.");
     if (f.password !== f.password2) return msg("regMsg", "Las contraseñas no coinciden.");
+    if (!f.acepta_terminos || !f.acepta_privacidad) return msg("regMsg", ERR.CONSENTIMIENTO_REQUERIDO);
     busy(e.target, true);
-    const { data, error } = await sb.auth.signUp({ email: f.email.trim(), password: f.password, options: { data: { nombre: f.nombre.trim().replace(/^@+/, "") }, emailRedirectTo: SITE_URL } });
+    // Primero el registro trazable de la aceptación (si falla, no se crea la cuenta)
+    try { await rpc("record_consent", { p_email: f.email.trim(), p_terminos: true, p_privacidad: true, p_version: LEGAL_VERSION, p_url: location.href.slice(0, 300) }); }
+    catch (err) { busy(e.target, false); return msg("regMsg", friendly(err)); }
+    const { data, error } = await sb.auth.signUp({ email: f.email.trim(), password: f.password, options: { data: { nombre: f.nombre.trim().replace(/^@+/, ""), acepto_terminos: LEGAL_VERSION, acepto_privacidad: LEGAL_VERSION }, emailRedirectTo: SITE_URL } });
     busy(e.target, false);
     if (error) return msg("regMsg", friendly(error));
     if (!data.session) {
@@ -3523,7 +3597,7 @@ const AdminData = {
 const isAdmin = () => Store.profile?.role === "admin";
 
 /* Medios de pago de la venta física (sin integraciones: solo registro) */
-const POS_METHODS = { efectivo: "Efectivo", nequi: "Nequi", daviplata: "Daviplata", bancolombia: "Transferencia Bancolombia", transferencia: "Otra transferencia", addi: "Addi", tarjeta_debito: "Tarjeta débito", tarjeta_credito: "Tarjeta crédito", otro: "Otro" };
+const POS_METHODS = { efectivo: "Efectivo", nequi: "Nequi", daviplata: "Llave Bre-B", bancolombia: "Transferencia Bancolombia", transferencia: "Otra transferencia", addi: "Addi", tarjeta_debito: "Tarjeta débito", tarjeta_credito: "Tarjeta crédito", otro: "Otro" };
 const DOC_TYPES = { CC: "Cédula de ciudadanía", CE: "Cédula de extranjería", NIT: "NIT", TI: "Tarjeta de identidad", PP: "Pasaporte", PPT: "Permiso por protección temporal", RC: "Registro civil", OTRO: "Otro", NINGUNO: "Sin documento" };
 const payLabel = (k, canal) => canal === "fisica" || (!S().pagos[k] && POS_METHODS[k]) ? (POS_METHODS[k] || k) : PaymentGateway.label(k);
 
@@ -4244,7 +4318,8 @@ const Admin = {
     const list = [...map.values()].sort((a, b) => (b.pedidos.length + b.ventas.length) - (a.pedidos.length + a.ventas.length));
     const regs = AdminData.customers.filter(c => c.role === "client").length;
     const spent = c => c.pedidos.filter(o => o.estado !== "cancelado").reduce((a, o) => a + Number(o.total), 0) + c.ventas.filter(s => s.estado !== "anulada").reduce((a, s) => a + Number(s.total), 0);
-    return this.shell("clientes", `<div class="adm__head"><div><h1>Clientes</h1><p>${regs} con cuenta · ${list.filter(c => c.mostrador).length} de mostrador · ${list.filter(c => !c.registrado && !c.mostrador).length} invitados online (agrupados por teléfono).</p></div></div>
+    return this.shell("clientes", `<div class="adm__head"><div><h1>Clientes</h1><p>${regs} con cuenta · ${list.filter(c => c.mostrador).length} de mostrador · ${list.filter(c => !c.registrado && !c.mostrador).length} invitados online (agrupados por teléfono).</p></div>
+        <button class="btn btn--ghost" id="consentCsv" title="Registro de aceptación de Términos y Política de privacidad (Ley 1581)">Descargar aceptaciones (CSV)</button></div>
       <div class="tools"><input type="search" id="cq" placeholder="Buscar por nombre, documento, correo o teléfono" aria-label="Buscar clientes"></div>
       ${list.length ? `<div class="table-wrap"><table class="t" id="ctable"><thead><tr><th>Cliente</th><th>Documento</th><th>Contacto</th><th>Dirección</th><th>Tipo</th><th>Registro</th><th>Pedidos / ventas</th><th>Total comprado</th><th></th></tr></thead><tbody>
         ${list.map(c => `<tr data-search="${esc(norm([c.nombre, c.email, c.telefono, c.doc?.numero_documento].join(" ")))}"><td><b>${esc(c.nombre)}</b></td>
@@ -4260,6 +4335,16 @@ const Admin = {
       <p class="muted-text" style="font-size:12px;margin-top:12px">Eliminar un cliente registrado borra su cuenta, perfil, direcciones y favoritos. Sus pedidos y ventas se conservan con la copia de sus datos.</p>`);
   },
   mountCustomers() {
+    $("#consentCsv") && ($("#consentCsv").onclick = async () => {
+      try {
+        const rows = await fetchAll(() => sb.from("legal_consents").select("*").order("id"));
+        const cols = ["id", "created_at", "contexto", "documento", "version", "aceptado", "email", "user_id", "referencia", "ip", "user_agent", "url"];
+        const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        const csv = "\ufeff" + [cols.join(","), ...rows.map(r => cols.map(c => cell(r[c])).join(","))].join("\r\n");
+        const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })), download: `aceptaciones-legales-${new Date().toISOString().slice(0, 10)}.csv` });
+        a.click(); URL.revokeObjectURL(a.href); toast(`${rows.length} registros descargados`);
+      } catch (e) { toast(friendly(e)); }
+    });
     $("#cq") && ($("#cq").oninput = e => { const q = norm(e.target.value); $$("#ctable tbody tr").forEach(tr => { tr.hidden = q && !tr.dataset.search.includes(q); }); });
     $$("[data-deluser]").forEach(b => b.onclick = async () => {
       const u = AdminData.customers.find(x => x.id === b.dataset.deluser); if (!u) return;
@@ -4963,7 +5048,7 @@ const Loyalty = {
 /* Aviso flotante para invitados: invita a crear cuenta. Se minimiza a un botón pequeño. */
 const ClubPromo = {
   el: null, timer: null,
-  hidden() { const r = currentRoute().name; return !Store.ready || !!Store.user || !Loyalty.on() || ["cuenta", "checkout", "admin", "p"].includes(r); },
+  hidden() { const r = currentRoute().name; return !Store.ready || !!Store.user || !Loyalty.on() || !!$(".cookie-bar") || ["cuenta", "checkout", "admin", "p"].includes(r); },
   build() {
     const cfg = Loyalty.cfg();
     const el = document.createElement("aside");
@@ -5508,7 +5593,15 @@ async function onSession(session, event) {
   if (event === "PASSWORD_RECOVERY") { Recovery.start(); location.hash = "#/cuenta/nueva-clave"; }
 }
 
+function cookieNotice() {
+  if (Local.get("cookiesOk") || document.body.classList.contains("is-admin")) return;
+  const el = document.createElement("div"); el.className = "cookie-bar"; el.setAttribute("role", "region"); el.setAttribute("aria-label", "Aviso de cookies");
+  el.innerHTML = `<p>Usamos solo almacenamiento técnico para tu sesión, carrito y favoritos. No usamos cookies de publicidad. <a href="#/politicas#cookies">Política de cookies</a> · <a href="#/politicas#privacidad">Privacidad</a></p><button type="button" class="btn btn--sm">Entendido</button>`;
+  el.querySelector("button").onclick = () => { Local.set("cookiesOk", LEGAL_VERSION); el.remove(); ClubPromo.update(); };
+  document.body.appendChild(el);
+}
 (async function init() {
+  cookieNotice();
   applyBranding(); updateCounts(); render();
   addEventListener("hashchange", async () => { closeAll(); if (/^#\/?(error|error_code|access_token)=/.test(location.hash)) await processAuthLink().catch(() => {}); render(); });
   try {
