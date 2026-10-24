@@ -1677,8 +1677,10 @@ body.theme-dark .consents a{color:#7aa7ff}
 .cookie-bar button{width:26px;height:26px;border-radius:50%;color:#bdb8ad;font-size:11px}
 .cookie-bar button:hover{color:#fff;background:rgba(255,255,255,.1)}
 body.is-admin .cookie-bar{display:none}
+
+.captcha-box{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:130}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" integrity="sha384-2zrRDgDHSYB/GN3nFW3fsZXoxEhKIr3N2h63Tc6DEOB9JJdFIu8xMJT2Cph/gBil" crossorigin="anonymous"></script>
 </head>
 <body class="theme-light">
 <a href="#app" class="skip">Saltar al contenido</a>
@@ -1929,6 +1931,9 @@ const CATALOG_SEED_URL = "img/catalogo/catalogo.json";   // catálogo de La Perc
 const Store = { addresses: [], ready: false, error: null, settings: structuredClone(DEFAULT_SETTINGS), categories: [], products: [], user: null, profile: null, favs: new Set() };
 
 const ERR = {
+  DEMASIADOS_PEDIDOS: "Se han hecho demasiados pedidos desde tu conexión en la última hora. Espera un momento o escríbenos por WhatsApp.",
+  DEMASIADOS_PEDIDOS_PENDIENTES: "Ya tienes 3 pedidos pendientes de pago con este teléfono. Escríbenos por WhatsApp para completarlos.",
+  DEMASIADOS_INTENTOS: "Demasiados intentos desde tu conexión. Espera unos minutos e inténtalo de nuevo.",
   CONSENTIMIENTO_REQUERIDO: "Debes aceptar los Términos y condiciones y la Política de privacidad para continuar.",
   CONTRAENTREGA_SOLO_VALLEDUPAR: "El pago contra entrega solo está disponible para entregas en Valledupar. Elige otro método de pago.",
   EMAIL_REQUERIDO: "Escribe un correo electrónico válido: allí te enviamos la factura.",
@@ -1976,7 +1981,9 @@ function friendly(e) {
   if (/Invalid login credentials/i.test(m)) return "Correo o contraseña incorrectos.";
   if (/Email not confirmed/i.test(m)) return "Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.";
   if (/already registered|already been registered/i.test(m)) return "Ya existe una cuenta con ese correo.";
-  if (/Password should be at least/i.test(m)) return "La contraseña es demasiado corta.";
+  if (/Password should be at least/i.test(m)) return "La contraseña debe tener mínimo 8 caracteres.";
+  if (/Password should contain|weak_password|at least one character of each/i.test(m)) return "La contraseña debe tener letras y números.";
+  if (/captcha/i.test(m)) return "No pudimos verificar que eres una persona. Recarga la página e inténtalo de nuevo.";
   if (/rate limit|too many/i.test(m)) return "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.";
   if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return "Sin conexión con el servidor. Revisa tu internet e inténtalo de nuevo.";
   if (/same_password|different from the old/i.test(m)) return "La nueva contraseña debe ser distinta a la actual.";
@@ -3362,7 +3369,7 @@ function mountAccount() {
     e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
     if (!/^\S+@\S+\.\S+$/.test(f.email.trim()) || !f.password) return msg("loginMsg", "Escribe tu correo y tu contraseña.");
     busy(e.target, true);
-    const { error } = await sb.auth.signInWithPassword({ email: f.email.trim(), password: f.password });
+    const { error } = await sb.auth.signInWithPassword({ email: f.email.trim(), password: f.password, options: { captchaToken: await Captcha.token() } });
     busy(e.target, false);
     if (error) {
       msg("loginMsg", friendly(error));
@@ -3388,7 +3395,7 @@ function mountAccount() {
     const email = $("#bl_email").value.trim();
     if (!/^\S+@\S+\.\S+$/.test(email)) return msg("badLinkMsg", "Escribe un correo válido.");
     if (act === "signup") return resendSignup(email, null, "badLinkMsg");
-    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL });
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL, captchaToken: await Captcha.token() });
     msg("badLinkMsg", error && !/rate|seconds/i.test(error.message) ? friendly(error) : error ? "Ya enviamos un correo hace poco. Espera un minuto e inténtalo de nuevo." : "Si el correo está registrado, te enviamos un enlace nuevo. Revisa también Spam y Promociones.", !error);
   };
   $("#badLinkForm") && ($("#badLinkForm").onsubmit = e => { e.preventDefault(); badLink(e.submitter?.dataset.act || $("#badLinkForm [type=submit]").dataset.act)(); });
@@ -3397,7 +3404,7 @@ function mountAccount() {
     e.preventDefault(); const email = $("#rc_email").value.trim();
     if (!/^\S+@\S+\.\S+$/.test(email)) return msg("recoverMsg", "Escribe un correo válido.");
     busy(e.target, true);
-    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL });
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL, captchaToken: await Captcha.token() });
     busy(e.target, false);
     msg("recoverMsg", error && !/rate|seconds/i.test(error.message) ? friendly(error) : error ? "Ya enviamos un correo hace poco. Espera un minuto e inténtalo de nuevo." : "Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva. Revisa también Spam y Promociones.", !error);
   });
@@ -3412,7 +3419,7 @@ function mountAccount() {
     // Primero el registro trazable de la aceptación (si falla, no se crea la cuenta)
     try { await rpc("record_consent", { p_email: f.email.trim(), p_terminos: true, p_privacidad: true, p_version: LEGAL_VERSION, p_url: location.href.slice(0, 300) }); }
     catch (err) { busy(e.target, false); return msg("regMsg", friendly(err)); }
-    const { data, error } = await sb.auth.signUp({ email: f.email.trim(), password: f.password, options: { data: { nombre: f.nombre.trim().replace(/^@+/, ""), acepto_terminos: LEGAL_VERSION, acepto_privacidad: LEGAL_VERSION }, emailRedirectTo: SITE_URL } });
+    const { data, error } = await sb.auth.signUp({ email: f.email.trim(), password: f.password, options: { data: { nombre: f.nombre.trim().replace(/^@+/, ""), acepto_terminos: LEGAL_VERSION, acepto_privacidad: LEGAL_VERSION }, emailRedirectTo: SITE_URL, captchaToken: await Captcha.token() } });
     busy(e.target, false);
     if (error) return msg("regMsg", friendly(error));
     if (!data.session) {
@@ -3447,7 +3454,7 @@ function mountAccount() {
     e.target.reset(); msg("pwMsg", "Contraseña actualizada.", true);
   });
   $("#sendRecovery") && ($("#sendRecovery").onclick = async () => {
-    const { error } = await sb.auth.resetPasswordForEmail(Store.user.email, { redirectTo: SITE_URL });
+    const { error } = await sb.auth.resetPasswordForEmail(Store.user.email, { redirectTo: SITE_URL, captchaToken: await Captcha.token() });
     msg("recMsg2", error ? friendly(error) : "Enlace enviado. Revisa tu correo.", !error);
   });
   $("#prefForm") && ($("#prefForm").onsubmit = async e => {
@@ -3512,7 +3519,7 @@ async function resendSignup(email, btn, msgId) {
   if (!/^\S+@\S+\.\S+$/.test(email || "")) return out("Escribe un correo válido.");
   if (Date.now() < resendUntil) return out(`Espera ${Math.ceil((resendUntil - Date.now()) / 1000)} segundos para volver a enviarlo.`);
   if (btn) btn.disabled = true;
-  const { error } = await sb.auth.resend({ type: "signup", email, options: { emailRedirectTo: SITE_URL } });
+  const { error } = await sb.auth.resend({ type: "signup", email, options: { emailRedirectTo: SITE_URL, captchaToken: await Captcha.token() } });
   if (btn) btn.disabled = false;
   resendUntil = Date.now() + 60000;
   out(error && !/rate|seconds/i.test(error.message) ? friendly(error) : error ? "Ya enviamos un correo hace poco. Espera un minuto e inténtalo de nuevo." : "Listo. Si la cuenta está pendiente de confirmar, te llegará un correo nuevo en unos minutos.", !error);
@@ -3714,7 +3721,7 @@ const Admin = {
     $("#admSwitch") && ($("#admSwitch").onclick = async () => { await sb.auth.signOut(); });
     $("#admAuth") && ($("#admAuth").onsubmit = async e => {
       e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); $$("button", e.target).forEach(b => b.disabled = true);
-      const { error } = await sb.auth.signInWithPassword({ email: f.email.trim(), password: f.password });
+      const { error } = await sb.auth.signInWithPassword({ email: f.email.trim(), password: f.password, options: { captchaToken: await Captcha.token() } });
       $$("button", e.target).forEach(b => b.disabled = false);
       if (error) $("#admMsg").textContent = friendly(error);
     });
@@ -5146,11 +5153,33 @@ async function sendThanksEmail(o) {
    No es una factura electrónica: no lleva CUFE/QR salvo que una integración
    real con un proveedor autorizado los registre en la venta (campos fe_*).
    ========================================================================= */
-function loadScript(src) {
-  return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("No se pudo cargar el generador de PDF. Revisa tu conexión.")); document.head.appendChild(s); });
+/* Cloudflare Turnstile: Supabase Auth exige este token cuando el CAPTCHA está activo
+   (Authentication → Attack Protection). Invisible: solo pide interacción si el tráfico parece un bot.
+   La clave secreta vive solo en Supabase; esta es la clave pública del widget. */
+const TURNSTILE_SITEKEY = "0x4AAAAAAFkZpcT94uJsQQLE";
+const Captcha = {
+  on: () => /(^|\.)laperchavup\.com$/.test(location.hostname),   // el widget solo está autorizado para el dominio
+  async token() {
+    if (!this.on()) return undefined;
+    if (!window.turnstile) { try { await loadScript("https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"); } catch { return undefined; } }
+    let box = $("#captchaBox");
+    if (!box) { box = document.createElement("div"); box.id = "captchaBox"; box.className = "captcha-box"; document.body.appendChild(box); }
+    box.innerHTML = "<div></div>";
+    return new Promise(res => {
+      let id = null;
+      const fail = () => { done(); res(undefined); };
+      const timer = setTimeout(fail, 60000);
+      const done = () => { clearTimeout(timer); try { if (id != null) turnstile.remove(id); } catch {} box.innerHTML = ""; };
+      id = turnstile.render(box.firstChild, { sitekey: TURNSTILE_SITEKEY, appearance: "interaction-only", language: "es",
+        callback: tok => { done(); res(tok); }, "error-callback": fail, "expired-callback": fail });
+    });
+  }
+};
+function loadScript(src, integrity, errMsg = "No se pudo cargar el generador de PDF. Revisa tu conexión.") {
+  return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; if (integrity) { s.integrity = integrity; s.crossOrigin = "anonymous"; } s.onload = res; s.onerror = () => rej(new Error(errMsg)); document.head.appendChild(s); });
 }
 const Invoice = {
-  async lib() { if (!window.jspdf) await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"); return window.jspdf.jsPDF; },
+  async lib() { if (!window.jspdf) await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js", "sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"); return window.jspdf.jsPDF; },
   async logo(url) {
     if (!url) return null;
     try { const b = await (await fetch(url, { mode: "cors" })).blob(); return await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); }); } catch { return null; }
