@@ -1233,7 +1233,7 @@ body.theme-light .visit__txt p{color:rgba(243,238,228,.8)}
 
 /* Políticas */
 .policies{display:grid;gap:14px;margin-top:clamp(24px,3vw,40px);max-width:860px}
-.policy{background:var(--paper);border:1px solid var(--line);padding:clamp(18px,2.4vw,28px)}
+.policy{scroll-margin-top:calc(var(--nav-h, 70px) + 50px);background:var(--paper);border:1px solid var(--line);padding:clamp(18px,2.4vw,28px)}
 .policy h2{margin:0 0 10px;font-family:var(--f-serif);font-weight:600;font-size:26px;color:var(--gold)}
 .policy p,.policy li{color:var(--ink-2);font-size:14.5px}
 .policy ul{padding-left:18px;margin:10px 0 0}
@@ -2588,13 +2588,17 @@ function viewPolicies() {
       <li>No nos hacemos responsables por pérdidas ni incautaciones. Cualquier inconveniente posterior a la entrega de la guía debe gestionarse directamente con la empresa de transporte elegida.</li>
       <li>En Valledupar también puedes recoger tu pedido en la tienda: ${esc(t.direccion)}.</li></ul>`)}
     ${sec("reembolsos", "Política de reembolsos", `<p>No hacemos devoluciones de dinero por cambio de opinión, talla, color o gusto personal; en esos casos aplica la política de cambios. <b>Sí devolvemos el dinero</b> en estos casos:</p>
-      <ul><li><b>Derecho de retracto</b> (ver abajo): dentro de los 5 días hábiles siguientes a la entrega. Reintegramos el valor pagado dentro de los 30 días calendario siguientes a la solicitud.</li>
+      <ul><li><b>Derecho de retracto</b> (ver abajo), en compras a distancia: dentro de los 5 días hábiles siguientes a la entrega. Te ofrecemos primero el cambio; si no lo quieres, reintegramos el valor pagado dentro de los 30 días calendario siguientes.</li>
       <li><b>Reversión del pago</b> (art. 51 de la Ley 1480 de 2011 y Decreto 587 de 2016), si pagaste con un medio electrónico y fuiste víctima de fraude, la operación no fue solicitada, no recibiste el producto o el producto es defectuoso o no corresponde a lo pedido. Debes pedirla dentro de los 5 días hábiles siguientes a conocer el hecho, a nosotros y a la entidad emisora de tu medio de pago, y devolver el producto si lo recibiste.</li>
       <li><b>Garantía</b>: cuando un producto defectuoso no pueda repararse ni cambiarse por uno igual.</li>
       <li><b>Pedido no despachado</b>: si ya pagaste y no tenemos el producto o cancelamos el pedido.</li>
       <li><b>Cobros errados o duplicados.</b></li></ul>
       <p>El reembolso se hace por el mismo medio de pago o por transferencia a una cuenta a nombre del comprador. Para solicitarlo escríbenos por WhatsApp o al correo ${esc(legalMail())} con tu número de pedido.</p>`)}
-    ${sec("retracto", "Derecho de retracto", `<p>En compras a distancia (página web o WhatsApp), conforme al artículo 47 de la Ley 1480 de 2011 (Estatuto del Consumidor), puedes retractarte dentro de los 5 días hábiles siguientes a la entrega, devolviendo el producto sin uso y en las mismas condiciones en que lo recibiste. Los costos de transporte de la devolución corren por tu cuenta y el dinero se reintegra dentro de los 30 días calendario siguientes. No aplica a las excepciones previstas en la ley (por ejemplo, prendas de uso personal íntimo o productos hechos a la medida).</p>`)}
+    ${sec("retracto", "Derecho de retracto", `<p>Aplica solo a compras a distancia (página web o WhatsApp), según el artículo 47 de la Ley 1480 de 2011. No aplica a compras hechas en la tienda física.</p>
+      <ul><li>Tienes 5 días hábiles desde que recibes el pedido para ejercerlo, devolviendo la prenda sin uso, sin lavar y con sus etiquetas.</li>
+      <li><b>Te ofrecemos primero el cambio</b> por otra talla, color u otra prenda de la tienda.</li>
+      <li>Si prefieres no hacer el cambio, la ley te da derecho a la devolución del dinero dentro de los 30 días calendario siguientes.</li>
+      <li>El envío de la devolución corre por tu cuenta. No aplica a las excepciones de la ley (por ejemplo, prendas de uso íntimo).</li></ul>`)}
     ${sec("garantia", "Garantía", `<p>Todos nuestros productos tienen la garantía legal de calidad e idoneidad del Estatuto del Consumidor (Ley 1480 de 2011). Si tu producto presenta un defecto, escríbenos por WhatsApp con tu número de pedido y fotos. Revisamos cada caso y, según corresponda, lo reparamos, lo cambiamos o devolvemos el dinero. La garantía no cubre el desgaste normal ni los daños por mal uso, lavado inadecuado o modificaciones.</p>`)}
     ${sec("privacidad", "Política de privacidad y tratamiento de datos personales", `<p>En cumplimiento de la Ley 1581 de 2012 y el Decreto 1074 de 2015 (que incorpora el Decreto 1377 de 2013), ${esc(legalName())} informa cómo trata tus datos personales.</p>
       <h3>Responsable</h3><p>${esc(legalName())}${legalNit()} · ${esc(t.direccion)} · WhatsApp ${esc(legalPhone())} · ${esc(legalMail())}.</p>
@@ -5405,7 +5409,7 @@ async function render() {
   else if (Store.error) html = isSetupError(Store.error) ? viewSetupNeeded() : viewError();
   else switch (r.name) {
     case "home": html = viewHome(); mount = mountHome; break;
-    case "politicas": html = viewPolicies(); mount = () => { const id = location.hash.split("#")[2]; id && document.getElementById(id)?.scrollIntoView(); }; break;
+    case "politicas": html = viewPolicies(); mount = () => { const id = location.hash.split("#")[2]; id && setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 60); }; break;
     case "categorias": html = viewCategories(); break;
     case "producto": html = viewProduct(r.param); mount = mountProduct; break;
     case "favoritos": html = viewFavs(); break;
