@@ -3,14 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>La Percha — Tienda de ropa exclusiva en Valledupar</title>
-<meta name="description" content="La Percha — tienda de ropa exclusiva en Valledupar: camisetas, jeans, conjuntos, calzado y accesorios. Pide en línea, confirma por WhatsApp y recibe en toda Colombia.">
+<title>La Percha VUP — Tienda de ropa en Valledupar | La Percha</title>
+<meta name="description" content="La Percha (La Percha VUP), tienda de ropa urbana en Valledupar: camisetas, jeans, conjuntos, tenis y accesorios. Tienda física en Valledupar y envíos a toda Colombia.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://laperchavup.com/">
 <meta name="theme-color" content="#111111">
+<meta name="geo.region" content="CO-CES">
+<meta name="geo.placename" content="Valledupar">
 <meta property="og:type" content="website">
-<meta property="og:title" content="La Percha — Tienda de ropa exclusiva">
-<meta property="og:description" content="Ropa, calzado y accesorios en Valledupar. Envíos a toda Colombia. Pide en línea y confirma por WhatsApp.">
-<meta property="og:image" content="assets/og-image.jpg">
+<meta property="og:site_name" content="La Percha">
+<meta property="og:locale" content="es_CO">
+<meta property="og:url" content="https://laperchavup.com/">
+<meta property="og:title" content="La Percha VUP — Tienda de ropa en Valledupar">
+<meta property="og:description" content="Ropa urbana, tenis y accesorios en Valledupar. Envíos a toda Colombia. Pide en línea y confirma por WhatsApp.">
+<meta property="og:image" content="https://laperchavup.com/assets/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"ClothingStore","@id":"https://laperchavup.com/#tienda","name":"La Percha","alternateName":["La Percha VUP","La Percha Valledupar","La Percha Store"],
+  "url":"https://laperchavup.com/","logo":"https://laperchavup.com/assets/logo-la-percha.png","image":"https://laperchavup.com/assets/og-image.jpg",
+  "description":"Tienda de ropa urbana en Valledupar: camisetas, jeans, conjuntos, tenis y accesorios. Envíos a toda Colombia.",
+  "telephone":"+57 314 454 3114","priceRange":"$$",
+  "address":{"@type":"PostalAddress","streetAddress":"Cra. 19E2 #13B-46, frente a la cancha de Las Flores","addressLocality":"Valledupar","addressRegion":"Cesar","addressCountry":"CO"},
+  "areaServed":"CO","sameAs":["https://www.instagram.com/laperchavup/","https://www.tiktok.com/@lapercha_store17"]},
+ {"@type":"WebSite","@id":"https://laperchavup.com/#web","url":"https://laperchavup.com/","name":"La Percha","alternateName":"La Percha VUP","inLanguage":"es-CO","publisher":{"@id":"https://laperchavup.com/#tienda"}}
+]}
+</script>
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -1683,6 +1701,7 @@ body.is-admin .cookie-bar{display:none}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" integrity="sha384-2zrRDgDHSYB/GN3nFW3fsZXoxEhKIr3N2h63Tc6DEOB9JJdFIu8xMJT2Cph/gBil" crossorigin="anonymous"></script>
 </head>
 <body class="theme-light">
+<noscript><h1>La Percha VUP — Tienda de ropa en Valledupar</h1><p>La Percha: ropa urbana, camisetas, jeans, conjuntos, tenis y accesorios. Cra. 19E2 #13B-46, frente a la cancha de Las Flores, Valledupar, Cesar. WhatsApp +57 314 454 3114. Envíos a toda Colombia.</p></noscript>
 <a href="#app" class="skip">Saltar al contenido</a>
 <div class="announce" aria-label="Información de la tienda"><div class="announce__track">
   <span>Envíos a toda Colombia</span><span>Bono de $20.000 cada 5 compras</span><span>Paga con Nequi, Llave o Bancolombia</span><span>Tienda física en Valledupar</span><span>Confirmamos tu pedido por WhatsApp</span>
@@ -5456,7 +5475,7 @@ async function render() {
   if (isAdm) bindAdminShell();
   const titles = { home: "Tienda de ropa exclusiva en Valledupar", politicas: "Políticas", tienda: "Tienda", ropa: "Ropa", calzado: "Calzado", accesorios: "Accesorios", mujer: "Mujer", sale: "Sale", categorias: "Categorías", favoritos: "Favoritos", checkout: "Finalizar compra", cuenta: "Mi cuenta", admin: "Administración", p: "Pedido", pedido: "Pedido " + (r.param || "") };
   const pt = r.name === "producto" ? Catalog.bySlug(r.param)?.nombre : r.name === "categoria" ? Catalog.category(r.param)?.nombre : titles[r.name];
-  document.title = `${S().tienda.nombre} — ${pt || (Store.ready ? "Página no encontrada" : "Tienda online")}`;
+  document.title = r.name === "home" ? "La Percha VUP — Tienda de ropa en Valledupar | La Percha" : `${S().tienda.nombre} — ${pt || (Store.ready ? "Página no encontrada" : "Tienda online")}`;
   $$("[data-nav]").forEach(a => { const on = a.dataset.nav === r.name || (r.name === "categoria" && a.dataset.nav === Catalog.category(r.param)?.grupo); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
   if (changed) { scrollTo({ top: 0, behavior: "instant" }); if (r.name !== "home") app.focus({ preventScroll: true }); } else scrollTo({ top: y, behavior: "instant" });
   onScroll(); reveal(); ClubPromo.update();
