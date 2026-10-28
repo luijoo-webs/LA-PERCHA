@@ -2285,6 +2285,20 @@ const money = n => n == null ? "—" : "$ " + Math.round(Number(n)).toLocaleStri
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const norm = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const slugify = s => norm(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+/* Devuelve la primera referencia libre con el prefijo configurado (defensiva, con fallback único) */
+function nextAvailableRef() {
+  try {
+    const prefijo = String(S()?.pedidos?.prefijo || "LP-").replace(/[^A-Za-z0-9-]/g, "") || "LP-";
+    const usadas = new Set(
+      (Store.products || []).map(p => String(p?.ref || "").trim().toUpperCase()).filter(Boolean)
+    );
+    for (let n = 1; n <= 9999; n++) {
+      const candidata = prefijo + String(n).padStart(4, "0");
+      if (!usadas.has(candidata.toUpperCase())) return candidata;
+    }
+  } catch (e) { console.warn("nextAvailableRef fallback:", e); }
+  return "LP-" + Date.now().toString(36).toUpperCase();
+}
 const fmtDate = iso => iso ? new Date(iso).toLocaleString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
 const fmtDay = iso => new Date(iso).toLocaleDateString("es-CO", { day: "2-digit", month: "short" });
 const digits = s => String(s || "").replace(/\D/g, "");
@@ -4058,8 +4072,7 @@ const Admin = {
   editor(id) {
     if (id === "nuevo") {
       if (!this.draft || !this.draft._new) {
-        const n = Store.products.length + 1;
-        this.draft = { _new: true, id: "p_" + Date.now().toString(36), ref: "LP-" + String(n).padStart(4, "0"), nombre: "", slug: "", categoria: Store.categories[0]?.slug, linea: null, genero: null,
+        this.draft = { _new: true, id: "p_" + Date.now().toString(36), ref: nextAvailableRef(), nombre: "", slug: "", categoria: Store.categories[0]?.slug, linea: null, genero: null,
           precio: null, precioAnterior: null, costo: null, imagenes: [], variantes: [{ id: null, talla: "Única", color: null, stock: 0, precio: null }], colores: [], descripcion: "",
           visible: true, enOferta: false, destacado: false, guiaTallas: null };
       }
@@ -4175,6 +4188,20 @@ const Admin = {
     $("#saveProd").onclick = async () => {
       const d = self.collect();
       if (!d.nombre) { toast("El nombre es obligatorio."); $("#e_nombre").focus(); return; }
+      /* Ref duplicada: validación defensiva antes de llamar al servidor */
+      try {
+        const refNorm = String(d.ref || "").trim().toUpperCase();
+        if (!refNorm) { toast("La referencia es obligatoria."); $("#e_ref")?.focus(); return; }
+        const dup = (Store.products || []).some(
+          p => String(p?.ref || "").trim().toUpperCase() === refNorm && p.id !== d.id
+        );
+        if (dup) {
+          toast(`La referencia ${d.ref} ya existe. Escribe otra.`);
+          $("#e_ref")?.focus();
+          $("#e_ref")?.select?.();
+          return;
+        }
+      } catch (e) { console.warn("validación ref:", e); }
       if (!d.variantes.length || d.variantes.some(v => !v.talla)) { toast("Cada variante necesita una talla (usa 'Única' si no aplica)."); return; }
       const keys = d.variantes.map(v => v.talla + "|" + (v.color || "")); if (new Set(keys).size !== keys.length) { toast("Hay variantes repetidas (misma talla y color)."); return; }
       if (d.colores.length && d.variantes.some(v => !v.color)) { toast("Asigna un color a cada variante, o elimina los colores."); return; }
