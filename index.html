@@ -2317,7 +2317,7 @@ const ICON = {
   wa: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.24 8.24 0 1 1 6.99 3.86Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06a6.77 6.77 0 0 1-3.37-2.95c-.14-.25.14-.23.4-.77.04-.08.02-.17-.02-.25-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74 1.57.68 2.19.74 2.97.62.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg>'
 };
 /* Las fotos del catálogo viven en img/catalogo/ y, opcionalmente, en Supabase Storage
-   (bucket "productos", carpeta catalogo/). Admin → Productos → "Subir fotos a Supabase" las copia y activa esta opción. */
+   (bucket "productos", carpeta catalogo/). */
 function mediaUrl(src) {
   const s = String(src || "");
   return S().catalogo?.fotosEnStorage && /^img\/catalogo\//.test(s) ? `${SUPABASE_URL}/storage/v1/object/public/productos/${s.slice(4)}` : s;
@@ -3995,7 +3995,7 @@ const Admin = {
   products(query) {
     const st = this.prodState; if (query?.f) st.f = query.f;
     return this.shell("productos", `<div class="adm__head"><div><h1>Productos</h1><p>${Store.products.length} productos · ${Store.products.filter(p => Catalog.isShown(p)).length} visibles en la tienda.</p></div>
-      <div class="head-actions"><button class="btn btn--ghost" id="upPhotos">${S().catalogo?.fotosEnStorage ? "Fotos en Supabase ✓ (volver a subir)" : "Subir fotos a Supabase"}</button><button class="btn btn--ghost" id="expCat">Exportar JSON</button><label class="btn btn--ghost" style="cursor:pointer">Importar JSON<input type="file" id="impCat" accept="application/json,.json" hidden></label><button class="btn btn--ghost" id="newCat">+ Nueva categoría</button><a class="btn" href="#/admin/productos/nuevo">+ Nuevo producto</a></div></div>
+      <div class="head-actions"><button class="btn btn--ghost" id="expCat">Exportar JSON</button><label class="btn btn--ghost" style="cursor:pointer">Importar JSON<input type="file" id="impCat" accept="application/json,.json" hidden></label><button class="btn btn--ghost" id="newCat">+ Nueva categoría</button><a class="btn" href="#/admin/productos/nuevo">+ Nuevo producto</a></div></div>
       ${!Store.products.length ? `<div class="adm-note info"><span>El catálogo en Supabase está vacío. Carga el catálogo inicial de La Percha (fotos, tallas y precios de su catálogo web) con un clic. Después registra el stock real en Inventario.</span> <button class="btn" id="seedCat">Cargar catálogo inicial</button></div>` : ""}
       <div class="tools"><input type="search" id="pq" placeholder="Buscar por nombre o referencia" value="${esc(st.q)}" aria-label="Buscar productos">
         <select id="pcat" aria-label="Categoría"><option value="">Todas las categorías</option>${Store.categories.map(c => `<option value="${c.slug}" ${st.cat === c.slug ? "selected" : ""}>${esc(c.nombre)}</option>`).join("")}</select>
@@ -4078,7 +4078,6 @@ const Admin = {
         } catch (err) { m.textContent = friendly(err); }
       };
     };
-    $("#upPhotos").onclick = () => uploadCatalogPhotos();
     $("#seedCat") && ($("#seedCat").onclick = async () => {
       try { const res = await fetch(CATALOG_SEED_URL, { cache: "no-store" }); if (!res.ok) throw new Error("No se encontró " + CATALOG_SEED_URL); const data = await res.json(); await importProducts(data.productos, { withCost: false }); }
       catch (err) { toast(friendly(err)); }
@@ -5007,31 +5006,6 @@ async function importProducts(items, { withCost }) {
   } catch (e) { toast("Importación detenida en " + done + ": " + friendly(e)); }
   if (box) box.hidden = true;
   await Api.loadCatalog({ admin: true }); render();
-}
-/* Copia las fotos de la carpeta img/catalogo (elegida desde el computador) a Supabase Storage,
-   bucket "productos", carpeta catalogo/. Así las fotos se ven aunque el hosting no tenga la carpeta img/. */
-function uploadCatalogPhotos() {
-  openModal("Subir fotos del catálogo a Supabase", `<p style="margin:0 0 12px;font-size:14px">Selecciona la carpeta <b>img/catalogo</b> del proyecto de La Percha en este computador.
-    Se suben solo las fotos (.jpg) y se reemplazan si ya existen. Puede tardar varios minutos: no cierres esta ventana.</p>
-    <label class="btn btn--block" style="cursor:pointer">Elegir carpeta img/catalogo<input type="file" id="phDir" webkitdirectory directory multiple hidden></label>
-    <p class="form-msg ok" id="phMsg" role="status" style="margin-top:12px"></p>`);
-  $("#phDir").onchange = async e => {
-    const files = [...e.target.files].filter(f => /\.jpe?g$/i.test(f.name) && /(^|\/)catalogo\//.test(f.webkitRelativePath));
-    const msg = t => { const el = $("#phMsg"); if (el) el.textContent = t; };
-    if (!files.length) return msg("No encontré fotos .jpg dentro de una carpeta llamada “catalogo”. Elige la carpeta img/catalogo.");
-    let done = 0, fail = 0; const queue = files.slice();
-    const worker = async () => { for (let f; (f = queue.shift());) {
-      const path = f.webkitRelativePath.slice(f.webkitRelativePath.indexOf("catalogo/"));
-      const { error } = await sb.storage.from("productos").upload(path, f, { contentType: "image/jpeg", upsert: true, cacheControl: "31536000" });
-      error ? fail++ : done++; msg(`Subiendo… ${done + fail} / ${files.length}${fail ? ` (${fail} con error)` : ""}`);
-    } };
-    await Promise.all([1, 2, 3, 4].map(worker));
-    if (done === 0) return msg(`No se pudo subir ninguna foto. Revisa que tu cuenta sea administradora y que el bucket “productos” exista (supabase/01_schema.sql).`);
-    const s = structuredClone(S()); s.catalogo = { ...s.catalogo, fotosEnStorage: true };
-    try { await Api.saveSettings(s); } catch (err) { return msg(friendly(err)); }
-    msg(`Listo: ${done} fotos subidas${fail ? ` y ${fail} con error (vuelve a intentarlo para completarlas)` : ""}. La tienda ya usa las fotos de Supabase.`);
-    toast("Fotos del catálogo en Supabase"); render();
-  };
 }
 function validProduct(p) { return p && typeof p.nombre === "string" && typeof p.categoria === "string" && Array.isArray(p.variantes) && p.variantes.length > 0; }
 function download(name, text) {
