@@ -3260,17 +3260,17 @@ function viewRecover() {
 
 /* ---------- Panel del cliente ---------- */
 function orderCard(o) {
-  const items = o.items || [];
+  const items = o.items || []; const fisica = o.canal === "fisica";
   return `<details class="order-card"><summary>
-      <span class="order-card__main"><b>${esc(o.numero)}</b><small>${fmtDate(o.created_at)} · ${esc(PaymentGateway.label(o.metodo_pago))}</small></span>
+      <span class="order-card__main"><b>${esc(o.numero)}</b><small>${fmtDate(o.created_at)} · ${esc(payLabel(o.metodo_pago, o.canal))}</small></span>
       ${statusPill(o.estado)}
       <span class="order-card__prods">${items.slice(0, 4).map(i => i.imagen ? img(Catalog.imageSm(i.imagen), "") : "").join("")}<em>${items.reduce((a, i) => a + i.cantidad, 0)} producto(s)</em></span>
       <b class="order-card__total">${money(o.total)}</b>
       <span class="order-card__more">Ver detalles</span></summary>
-    <div class="body"><h4 class="mini-h">Estado del pedido</h4>${statusFlow(o)}
+    <div class="body">${fisica ? '<h4 class="mini-h">Compra en la tienda física</h4>' : `<h4 class="mini-h">Estado del pedido</h4>${statusFlow(o)}`}
       <div class="mini-lines">${items.map(i => `<div>${i.imagen ? img(Catalog.imageSm(i.imagen), "") : "<span></span>"}<span>${esc(i.nombre)}<small>Talla ${esc(i.talla)}${i.color ? " · " + esc(i.color) : ""} · ${i.cantidad} × ${i.precio_unitario == null ? "a confirmar" : money(i.precio_unitario)}</small></span><b>${i.subtotal == null ? "—" : money(i.subtotal)}</b></div>`).join("")}</div>
-      <p class="muted-text">Entrega: ${esc(o.cliente.direccion)}, ${esc(o.cliente.barrio)}, ${esc(o.cliente.ciudad)} · Envío: ${o.envio == null ? "a coordinar" : money(o.envio)}</p>
-      <div class="btns-row"><a class="link-btn" href="${esc(waLink(orderWhatsAppText(o)))}" target="_blank" rel="noopener">Reenviar pedido por WhatsApp</a><a class="link-btn" href="${esc(waLink(`Hola ${S().tienda.nombre}, quiero consultar el estado de mi pedido ${o.numero}.`))}" target="_blank" rel="noopener">Consultar estado</a></div></div></details>`;
+      ${fisica ? "" : `<p class="muted-text">Entrega: ${esc(o.cliente.direccion)}, ${esc(o.cliente.barrio)}, ${esc(o.cliente.ciudad)} · Envío: ${o.envio == null ? "a coordinar" : money(o.envio)}</p>
+      <div class="btns-row"><a class="link-btn" href="${esc(waLink(orderWhatsAppText(o)))}" target="_blank" rel="noopener">Reenviar pedido por WhatsApp</a><a class="link-btn" href="${esc(waLink(`Hola ${S().tienda.nombre}, quiero consultar el estado de mi pedido ${o.numero}.`))}" target="_blank" rel="noopener">Consultar estado</a></div>`}</div></details>`;
 }
 function emptyState(icon, title, text, cta) {
   return `<div class="acct-empty">${uiIcon(icon, 34)}<h3>${esc(title)}</h3><p>${esc(text)}</p>${cta || ""}</div>`;
@@ -3995,7 +3995,7 @@ const Admin = {
   products(query) {
     const st = this.prodState; if (query?.f) st.f = query.f;
     return this.shell("productos", `<div class="adm__head"><div><h1>Productos</h1><p>${Store.products.length} productos · ${Store.products.filter(p => Catalog.isShown(p)).length} visibles en la tienda.</p></div>
-      <div class="head-actions"><button class="btn btn--ghost" id="upPhotos">${S().catalogo?.fotosEnStorage ? "Fotos en Supabase ✓ (volver a subir)" : "Subir fotos a Supabase"}</button><button class="btn btn--ghost" id="expCat">Exportar JSON</button><label class="btn btn--ghost" style="cursor:pointer">Importar JSON<input type="file" id="impCat" accept="application/json,.json" hidden></label><a class="btn" href="#/admin/productos/nuevo">+ Nuevo producto</a></div></div>
+      <div class="head-actions"><button class="btn btn--ghost" id="upPhotos">${S().catalogo?.fotosEnStorage ? "Fotos en Supabase ✓ (volver a subir)" : "Subir fotos a Supabase"}</button><button class="btn btn--ghost" id="expCat">Exportar JSON</button><label class="btn btn--ghost" style="cursor:pointer">Importar JSON<input type="file" id="impCat" accept="application/json,.json" hidden></label><button class="btn btn--ghost" id="newCat">+ Nueva categoría</button><a class="btn" href="#/admin/productos/nuevo">+ Nuevo producto</a></div></div>
       ${!Store.products.length ? `<div class="adm-note info"><span>El catálogo en Supabase está vacío. Carga el catálogo inicial de La Percha (fotos, tallas y precios de su catálogo web) con un clic. Después registra el stock real en Inventario.</span> <button class="btn" id="seedCat">Cargar catálogo inicial</button></div>` : ""}
       <div class="tools"><input type="search" id="pq" placeholder="Buscar por nombre o referencia" value="${esc(st.q)}" aria-label="Buscar productos">
         <select id="pcat" aria-label="Categoría"><option value="">Todas las categorías</option>${Store.categories.map(c => `<option value="${c.slug}" ${st.cat === c.slug ? "selected" : ""}>${esc(c.nombre)}</option>`).join("")}</select>
@@ -4058,6 +4058,25 @@ const Admin = {
         await importProducts(items, { withCost: true });
       } catch (err) { alert("No se pudo importar: " + friendly(err)); }
       e.target.value = "";
+    };
+    $("#newCat").onclick = () => {
+      openModal("Nueva categoría", `<form id="catForm" class="stack" novalidate>
+        <div class="field"><label for="catN">Nombre</label><input id="catN" maxlength="60" required placeholder="Ej.: Chaquetas"></div>
+        <div class="field"><label for="catG">Grupo</label><select id="catG">${Object.entries(GROUPS).map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select><span class="hint">Aparecerá en la tienda cuando tenga al menos un producto visible.</span></div>
+        <p class="form-msg" id="catMsg" role="status"></p>
+        <div class="co-actions"><button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button><button class="btn" type="submit">Crear categoría</button></div></form>`);
+      $("#catForm").onsubmit = async e => {
+        e.preventDefault(); const m = $("#catMsg"); const nombre = $("#catN").value.trim(); const slug = slugify(nombre);
+        if (!slug) { m.textContent = "Escribe el nombre de la categoría."; return; }
+        if (Catalog.category(slug)) { m.textContent = "Ya existe una categoría con ese nombre."; return; }
+        try {
+          const { error } = await sb.from("categories").insert({ slug, nombre, grupo: $("#catG").value, orden: Math.max(0, ...Store.categories.map(c => c.orden || 0)) + 1 });
+          if (error) throw error;
+          await Api.loadCatalog({ admin: true });
+          $("#pcat").insertAdjacentHTML("beforeend", `<option value="${esc(slug)}">${esc(nombre)}</option>`);
+          $("#catForm").innerHTML = `<p style="margin:0">Categoría <b>${esc(nombre)}</b> creada. Ya puedes elegirla al crear o editar un producto.</p><div class="co-actions"><button type="button" class="btn" data-close-modal>Listo</button></div>`;
+        } catch (err) { m.textContent = friendly(err); }
+      };
     };
     $("#upPhotos").onclick = () => uploadCatalogPhotos();
     $("#seedCat") && ($("#seedCat").onclick = async () => {
@@ -5659,7 +5678,7 @@ async function onSession(session, event) {
   Store.user = session?.user || null;
   await Api.loadProfile().catch(() => {});
   if (Store.user && prevUser !== Store.user.id) {
-    rpc("link_guest_orders").catch(() => {});
+    await rpc("link_guest_orders").catch(() => {});
     await mergeLocalFavs().catch(() => {});
   }
   await Api.loadFavs().catch(() => {});
