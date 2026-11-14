@@ -1909,7 +1909,8 @@ const DEFAULT_SETTINGS = {
     daviplata: { activo: true, nombre: "Llave Bre-B", descripcion: "Pagas desde la app de tu banco o billetera con nuestra llave. Te la enviamos por WhatsApp al confirmar el pedido." },
     bancolombia: { activo: true, nombre: "Transferencia Bancolombia", descripcion: "Te enviamos los datos de la cuenta Bancolombia por WhatsApp al confirmar el pedido." },
     addi: { activo: false, nombre: "Addi — paga a cuotas", descripcion: "Compra ahora y paga a cuotas con Addi. Te enviamos el enlace de pago por WhatsApp." ,
-            widgetSlug: "", widgetScript: "https://s3.amazonaws.com/widgets.addi.com/bundle.min.js" }
+            widgetSlug: "", widgetScript: "https://s3.amazonaws.com/widgets.addi.com/bundle.min.js" },
+    sistecredito: { activo: true, nombre: "Sistecrédito", descripcion: "Paga a cuotas con tu cupo de Sistecrédito. Te enviamos las instrucciones por WhatsApp al confirmar el pedido." }
   },
   pedidos: { prefijo: "LP-", digitos: 4, costoEnvio: null,
              textoEnvio: "Enviamos a toda Colombia por la transportadora que elijas. El costo y el tiempo de entrega se confirman por WhatsApp. Nos hacemos responsables hasta la entrega de la guía de envío; desde ese momento el paquete queda bajo responsabilidad de la transportadora.",
@@ -1931,7 +1932,8 @@ const PAYMENT_PROVIDERS = {
   nequi:         { integrado: true, nombre: "Nequi" },
   daviplata:     { integrado: true, nombre: "Llave Bre-B" },   // shortcut: el id interno sigue siendo "daviplata" (restricciones de la BD); solo cambia el nombre
   bancolombia:   { integrado: true, nombre: "Transferencia Bancolombia" },
-  addi:          { integrado: true, nombre: "Addi — paga a cuotas" }
+  addi:          { integrado: true, nombre: "Addi — paga a cuotas" },
+  sistecredito:  { integrado: true, nombre: "Sistecrédito" }
 };
 const ORDER_STATUS = { nuevo: "Nuevo", confirmado: "Confirmado", pago_pendiente: "Pendiente de pago", pagado: "Pagado",
   preparando: "Preparando", enviado: "Enviado", entregado: "Entregado", cancelado: "Cancelado" };
@@ -2219,10 +2221,17 @@ const CartService = {
 /* =========================================================================
    PEDIDOS: pagos, WhatsApp
    ========================================================================= */
+function payAdminRow(k, v) {
+  return `<div class="card-w" data-pay-row="${esc(k)}" style="padding:12px;margin:0"><div class="fg">
+    <div class="field"><label for="pn_${esc(k)}">Nombre</label><input id="pn_${esc(k)}" name="pn_${esc(k)}" maxlength="60" value="${esc(v.nombre || k)}"></div>
+    <label class="switch" style="align-self:end">Visible para el cliente<input type="checkbox" name="pay_${esc(k)}" ${v.activo ? "checked" : ""}></label>
+    <div class="field full"><label for="pd_${esc(k)}">Texto para el cliente</label><input id="pd_${esc(k)}" name="pd_${esc(k)}" value="${esc(v.descripcion || "")}"></div>
+    </div><button type="button" class="link-btn danger" data-pay-del="${esc(k)}">Quitar</button></div>`;
+}
 const PaymentGateway = {
   available() {
     const cfg = S().pagos;
-    return Object.keys(PAYMENT_PROVIDERS).filter(k => PAYMENT_PROVIDERS[k].integrado && cfg[k]?.activo).map(k => ({ id: k, ...cfg[k] }));
+    return Object.keys(cfg).filter(k => cfg[k]?.activo && !cfg[k]?.eliminado).map(k => ({ id: k, ...cfg[k] }));
   },
   label(id) { return S().pagos[id]?.nombre || PAYMENT_PROVIDERS[id]?.nombre || id; },
   /* Punto de integración para pasarelas (tarjeta, PSE, Nequi). Los métodos manuales se cierran por WhatsApp. */
@@ -4519,9 +4528,11 @@ const Admin = {
         </div></div>
       </div><div>
         <div class="card-w"><h2>Métodos de pago</h2><div class="switches">
-          ${Object.entries(PAYMENT_PROVIDERS).map(([k, pv]) => pv.integrado ? `<label class="switch">${esc(s.pagos[k]?.nombre || pv.nombre)}<input type="checkbox" name="pay_${k}" ${s.pagos[k]?.activo ? "checked" : ""}></label>
-            <div class="field"><label for="pd_${k}">Texto para el cliente</label><input id="pd_${k}" name="pd_${k}" value="${esc(s.pagos[k]?.descripcion || "")}"></div>`
-            : `<div class="switch" style="cursor:default;color:var(--muted)">${esc(pv.nombre)}<span class="tag">Requiere integración</span></div>`).join("")}
+          ${Object.entries(s.pagos).filter(([, v]) => !v.eliminado).map(([k, v]) => payAdminRow(k, v)).join("")}
+          <div id="payNew"></div>
+          <div class="fg"><div class="field"><label for="payNewN">Nuevo método de pago</label><input id="payNewN" maxlength="60" placeholder="Ej.: Tarjeta de crédito"></div>
+            <div class="field" style="align-self:end"><button type="button" class="btn btn--ghost" id="payAdd">+ Agregar método</button></div></div>
+          <span class="hint">Desmarca “Visible para el cliente” para ocultar un método sin borrarlo. “Quitar” lo elimina de la lista. Los cambios se aplican al guardar la configuración.</span>
         </div>
         <div class="fg" style="margin-top:12px">
           ${f("addi_slug", "Addi: identificador de comercio (ally slug)", s.pagos.addi?.widgetSlug, "text", 'placeholder="Lo entrega Addi al aprobar el comercio"')}
@@ -4546,6 +4557,17 @@ const Admin = {
   },
   mountSettings() {
     $("#wa_numero").oninput = e => { let d = digits(e.target.value); if (d.length === 10 && d.startsWith("3")) d = "57" + d; $("#waPreview").textContent = "https://wa.me/" + d; };
+    $("#payAdd").onclick = () => {
+      const n = $("#payNewN").value.trim(), k = slugify(n).replace(/-/g, "_");
+      if (!k) return toast("Escribe el nombre del método de pago.");
+      if ($(`[data-pay-row="${k}"]`) || (S().pagos[k] && !S().pagos[k].eliminado && !$(`[name="pdel_${k}"]`))) return toast("Ese método de pago ya existe.");
+      $(`[name="pdel_${k}"]`)?.remove();
+      $("#payNew").insertAdjacentHTML("beforeend", payAdminRow(k, { nombre: n, activo: true, descripcion: "" })); $("#payNewN").value = "";
+    };
+    $("#setForm").addEventListener("click", e => {
+      const b = e.target.closest("[data-pay-del]"); if (!b) return;
+      b.closest("[data-pay-row]").outerHTML = `<input type="hidden" name="pdel_${b.dataset.payDel}" value="1">`;
+    });
     $("#saveSet").onclick = async () => {
       const fd = Object.fromEntries(new FormData($("#setForm"))); const s = structuredClone(S());
       let wa = digits(fd.wa_numero); if (wa.length === 10 && wa.startsWith("3")) wa = "57" + wa;
@@ -4556,7 +4578,11 @@ const Admin = {
       if (s.pagos.addi) { s.pagos.addi.widgetSlug = (fd.addi_slug || "").trim(); s.pagos.addi.widgetScript = (fd.addi_script || "").trim(); }
       s.pedidos.prefijo = fd.o_prefijo.trim() || "LP-"; s.pedidos.costoEnvio = fd.o_envio === "" ? null : Math.max(0, Math.round(Number(fd.o_envio)));
       s.pedidos.textoEnvio = fd.o_texto.trim(); s.pedidos.politicaCambios = fd.o_cambios.trim();
-      for (const k of Object.keys(PAYMENT_PROVIDERS)) if (PAYMENT_PROVIDERS[k].integrado) s.pagos[k] = { ...s.pagos[k], activo: !!fd["pay_" + k], descripcion: (fd["pd_" + k] || "").trim() || DEFAULT_SETTINGS.pagos[k].descripcion };
+      for (const k of new Set([...Object.keys(s.pagos), ...Object.keys(fd).filter(n => n.startsWith("pn_")).map(n => n.slice(3))])) {
+        if (fd["pdel_" + k]) s.pagos[k] = { ...s.pagos[k], activo: false, eliminado: true };
+        else if ("pn_" + k in fd) s.pagos[k] = { ...s.pagos[k], nombre: fd["pn_" + k].trim() || s.pagos[k]?.nombre || k, activo: !!fd["pay_" + k], eliminado: false,
+          descripcion: (fd["pd_" + k] || "").trim() || DEFAULT_SETTINGS.pagos[k]?.descripcion || "Te enviamos las instrucciones de pago por WhatsApp al confirmar el pedido." };
+      }
       s.catalogo.permitirSinPrecio = !!fd.c_sinprecio; s.catalogo.porPagina = Math.min(96, Math.max(8, parseInt(fd.c_pp) || 24));
       s.inventario.umbralStockBajo = Math.max(0, parseInt(fd.i_umbral) || 0);
       try { await Api.saveSettings(s); applyBranding(); toast("Configuración guardada"); render(); } catch (e) { toast(friendly(e)); }
