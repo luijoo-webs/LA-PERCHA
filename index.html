@@ -2061,12 +2061,14 @@ const Api = {
     if (error) throw error;
     const s = structuredClone(DEFAULT_SETTINGS);
     for (const row of data) {
+      if (row.key === "pagos") Store.pagosGuardados = new Set(Object.keys(row.value || {}));
       if (row.key === "pagos") for (const k of Object.keys(row.value || {})) s.pagos[k] = { ...(s.pagos[k] || {}), ...row.value[k] };
       else s[row.key] = { ...(s[row.key] || {}), ...(row.value || {}) };
     }
     Store.settings = s;
   },
   async saveSettings(s) {
+    Store.pagosGuardados = new Set(Object.keys(s.pagos || {}));   // solo se ofrecen métodos que create_order acepta
     const rows = ["tienda", "whatsapp", "catalogo", "pagos", "pedidos", "inventario", "facturacion"].map(key => ({ key, value: s[key], updated_at: new Date().toISOString() }));
     const { error } = await sb.from("store_settings").upsert(rows);
     if (error) throw error;
@@ -2231,7 +2233,7 @@ function payAdminRow(k, v) {
 const PaymentGateway = {
   available() {
     const cfg = S().pagos;
-    return Object.keys(cfg).filter(k => cfg[k]?.activo && !cfg[k]?.eliminado).map(k => ({ id: k, ...cfg[k] }));
+    return Object.keys(cfg).filter(k => cfg[k]?.activo && !cfg[k]?.eliminado && (!Store.pagosGuardados || Store.pagosGuardados.has(k))).map(k => ({ id: k, ...cfg[k] }));
   },
   label(id) { return S().pagos[id]?.nombre || PAYMENT_PROVIDERS[id]?.nombre || id; },
   /* Punto de integración para pasarelas (tarjeta, PSE, Nequi). Los métodos manuales se cierran por WhatsApp. */
